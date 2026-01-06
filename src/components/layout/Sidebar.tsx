@@ -161,16 +161,16 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           <Link to="/dashboard" className="flex items-center gap-2">
             <div className="w-12 h-12">
               <img
-                src="/logo.png"
+                src="/pb-logo.png"
                 alt="ParaBuild Logo"
                 className="w-full h-full object-contain"
               />
             </div>
-            {!isCollapsed && (
+            /* {!isCollapsed && (
               <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                 ParaBuild
               </span>
-            )}
+            )} */
           </Link>
           {!isCollapsed && (
             <button
