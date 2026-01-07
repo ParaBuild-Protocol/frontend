@@ -17,12 +17,18 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAppKit } from "@reown/appkit/react";
-import { useAppKitAccount } from "@reown/appkit/react";
+import {
+  useAppKit,
+  useAppKitAccount,
+  useAppKitProvider,
+} from "@reown/appkit/react";
+import { toast } from "sonner";
 import { platformStats } from "@/data/mockData";
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useAuthStore } from "@/store/authStore";
+import { BrowserProvider } from "ethers";
 
 const getThemeColors = () => {
   const rootStyles = getComputedStyle(document.documentElement);
@@ -449,7 +455,9 @@ const FeatureCard = ({ icon: Icon, title, description, delay = 0 }) => (
 export default function LandingPage() {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
-  const { isConnected } = useAppKitAccount();
+  const { isAuthenticated, authenticating, authenticate } = useAuthStore();
+  const { address, isConnected } = useAppKitAccount();
+  const { walletProvider } = useAppKitProvider("eip155");
   const { open } = useAppKit();
 
   useEffect(() => {
@@ -458,11 +466,25 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleConnect = () => {
-    if (isConnected) {
+  const handleConnect = async () => {
+    // If already authenticated, navigate to dashboard
+    if (isAuthenticated) {
       navigate("/dashboard");
-    } else {
+      return;
+    }
+
+    // If connected but not authenticated, show message
+    if (isConnected && !isAuthenticated) {
+      const provider = new BrowserProvider(walletProvider);
+      authenticate(address, provider);
+      toast.info("Authenticating your wallet...");
+      return;
+    }
+
+    // If not connected, open wallet modal
+    if (!isConnected) {
       open();
+      return;
     }
   };
 
@@ -523,9 +545,33 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-4">
             <ThemeToggle />
-            <Button variant="ghost" size="sm" onClick={() => handleConnect()}>
-              Enter App
-              <ArrowRight className="ml-1 h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleConnect}
+              disabled={authenticating}
+            >
+              {authenticating ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Authenticating...
+                </>
+              ) : isAuthenticated ? (
+                <>
+                  Enter App
+                  <ChevronRight className="h-5 w-5" />
+                </>
+              ) : isConnected ? (
+                <>
+                  Sign Message
+                  <Wallet className="h-5 w-5" />
+                </>
+              ) : (
+                <>
+                  Connect Wallet
+                  <Wallet className="h-5 w-5" />
+                </>
+              )}
             </Button>
           </div>
         </div>
