@@ -17,12 +17,18 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAppKit } from "@reown/appkit/react";
-import { useAppKitAccount } from "@reown/appkit/react";
+import {
+  useAppKit,
+  useAppKitAccount,
+  useAppKitProvider,
+} from "@reown/appkit/react";
+import { toast } from "sonner";
 import { platformStats } from "@/data/mockData";
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useAuthStore } from "@/store/authStore";
+import { BrowserProvider } from "ethers";
 
 const getThemeColors = () => {
   const rootStyles = getComputedStyle(document.documentElement);
@@ -449,8 +455,17 @@ const FeatureCard = ({ icon: Icon, title, description, delay = 0 }) => (
 export default function LandingPage() {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
-  const { isConnected } = useAppKitAccount();
   const { open } = useAppKit();
+
+  // Get wallet state
+  const { address, isConnected } = useAppKitAccount();
+  const { walletProvider } = useAppKitProvider('eip155');
+  
+  // Get auth state from Zustand
+  const { isAuthenticated, authenticating, authenticate } = useAuthStore();
+  
+  // Track if we've already triggered auth
+  const authTriggeredRef = useRef(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -458,14 +473,80 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleConnect = () => {
-    if (isConnected) {
+  
+  // AUTO-NAVIGATE: When authenticated, go to dashboard
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     console.log("✅ Authenticated! Navigating to dashboard...");
+  //     navigate("/dashboard");
+  //   }
+  // }, [isAuthenticated, navigate]);
+
+  // AUTO-AUTHENTICATE: When wallet connects, immediately trigger sign message
+  useEffect(() => {
+    const shouldAuthenticate = 
+      isConnected && 
+      !isAuthenticated && 
+      address && 
+      walletProvider && 
+      !authenticating &&
+      !authTriggeredRef.current; // Prevent duplicate triggers
+
+    if (shouldAuthenticate) {
+      console.log("🔐 Wallet connected! Auto-triggering authentication...");
+      authTriggeredRef.current = true; // Mark as triggered
+      
+      const triggerAuth = async () => {
+        try {
+          toast.info("Please sign the message to authenticate...");
+          const provider = new BrowserProvider(walletProvider);
+          await authenticate(address, provider);
+          console.log("✅ Authentication successful!");
+          navigate("/dashboard");
+        } catch (error) {
+          console.error("❌ Authentication failed:", error);
+          authTriggeredRef.current = false; // Reset so user can try again
+        }
+      };
+      
+      // Small delay to ensure wallet provider is ready
+      const timer = setTimeout(triggerAuth, 300);
+      return () => clearTimeout(timer);
+    }
+    
+    // Reset auth trigger flag when wallet disconnects
+    if (!isConnected) {
+      authTriggeredRef.current = false;
+    }
+  }, [isConnected, isAuthenticated, address, walletProvider, authenticating, authenticate]);
+
+
+  const handleConnect = async () => {
+    // If already authenticated, navigate to dashboard
+    if (isAuthenticated) {
       navigate("/dashboard");
-    } else {
+      return;
+    }
+
+    // If connected but not authenticated, manually trigger sign
+    if (isConnected && !isAuthenticated && address && walletProvider) {
+      try {
+        toast.info("Please sign the message to authenticate...");
+        const provider = new BrowserProvider(walletProvider);
+        await authenticate(address, provider);
+        // Navigation happens automatically via useEffect
+      } catch (error) {
+        console.error("Authentication failed:", error);
+      }
+      return;
+    }
+
+    // If not connected, open wallet modal
+    if (!isConnected) {
       open();
+      return;
     }
   };
-
   return (
     <div className="min-h-screen bg-background overflow-hidden">
       {/* Enhanced Background with Gradient Mesh */}
@@ -523,9 +604,33 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-4">
             <ThemeToggle />
-            <Button variant="ghost" size="sm" onClick={() => handleConnect()}>
-              Enter App
-              <ArrowRight className="ml-1 h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleConnect}
+              disabled={authenticating}
+            >
+              {authenticating ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Authenticating...
+                </>
+              ) : isAuthenticated ? (
+                <>
+                  Enter App
+                  <ChevronRight className="h-5 w-5" />
+                </>
+              ) : isConnected ? (
+                <>
+                  Sign Message
+                  <Wallet className="h-5 w-5" />
+                </>
+              ) : (
+                <>
+                  Connect Wallet
+                  <Wallet className="h-5 w-5" />
+                </>
+              )}
             </Button>
           </div>
         </div>
