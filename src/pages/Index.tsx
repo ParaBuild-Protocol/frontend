@@ -455,16 +455,71 @@ const FeatureCard = ({ icon: Icon, title, description, delay = 0 }) => (
 export default function LandingPage() {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
-  const { isAuthenticated, authenticating, authenticate } = useAuthStore();
-  const { address, isConnected } = useAppKitAccount();
-  const { walletProvider } = useAppKitProvider("eip155");
   const { open } = useAppKit();
+
+  // Get wallet state
+  const { address, isConnected } = useAppKitAccount();
+  const { walletProvider } = useAppKitProvider('eip155');
+  
+  // Get auth state from Zustand
+  const { isAuthenticated, authenticating, authenticate } = useAuthStore();
+  
+  // Track if we've already triggered auth
+  const authTriggeredRef = useRef(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  
+  // AUTO-NAVIGATE: When authenticated, go to dashboard
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     console.log("✅ Authenticated! Navigating to dashboard...");
+  //     navigate("/dashboard");
+  //   }
+  // }, [isAuthenticated, navigate]);
+
+  // AUTO-AUTHENTICATE: When wallet connects, immediately trigger sign message
+  useEffect(() => {
+    const shouldAuthenticate = 
+      isConnected && 
+      !isAuthenticated && 
+      address && 
+      walletProvider && 
+      !authenticating &&
+      !authTriggeredRef.current; // Prevent duplicate triggers
+
+    if (shouldAuthenticate) {
+      console.log("🔐 Wallet connected! Auto-triggering authentication...");
+      authTriggeredRef.current = true; // Mark as triggered
+      
+      const triggerAuth = async () => {
+        try {
+          toast.info("Please sign the message to authenticate...");
+          const provider = new BrowserProvider(walletProvider);
+          await authenticate(address, provider);
+          console.log("✅ Authentication successful!");
+          navigate("/dashboard");
+        } catch (error) {
+          console.error("❌ Authentication failed:", error);
+          authTriggeredRef.current = false; // Reset so user can try again
+        }
+      };
+      
+      // Small delay to ensure wallet provider is ready
+      const timer = setTimeout(triggerAuth, 300);
+      return () => clearTimeout(timer);
+    }
+    
+    // Reset auth trigger flag when wallet disconnects
+    if (!isConnected) {
+      authTriggeredRef.current = false;
+    }
+  }, [isConnected, isAuthenticated, address, walletProvider, authenticating, authenticate]);
+
 
   const handleConnect = async () => {
     // If already authenticated, navigate to dashboard
@@ -473,11 +528,16 @@ export default function LandingPage() {
       return;
     }
 
-    // If connected but not authenticated, show message
-    if (isConnected && !isAuthenticated) {
-      const provider = new BrowserProvider(walletProvider);
-      authenticate(address, provider);
-      toast.info("Authenticating your wallet...");
+    // If connected but not authenticated, manually trigger sign
+    if (isConnected && !isAuthenticated && address && walletProvider) {
+      try {
+        toast.info("Please sign the message to authenticate...");
+        const provider = new BrowserProvider(walletProvider);
+        await authenticate(address, provider);
+        // Navigation happens automatically via useEffect
+      } catch (error) {
+        console.error("Authentication failed:", error);
+      }
       return;
     }
 
@@ -487,7 +547,6 @@ export default function LandingPage() {
       return;
     }
   };
-
   return (
     <div className="min-h-screen bg-background overflow-hidden">
       {/* Enhanced Background with Gradient Mesh */}
