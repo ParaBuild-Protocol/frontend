@@ -23,6 +23,10 @@ import ProfileEdit from "./pages/ProfileEdit";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import GigPage from "./pages/Gig";
+import SkillBadges from "./pages/SkillBadges";
+import Attestations from "./pages/Attestations";
+import BugBountyDetail from "./pages/BugBountyDetail";
+import BugBounties from "./pages/BugBounties";
 
 const queryClient = new QueryClient();
 
@@ -47,11 +51,15 @@ const App = () => (
               <Route path="/gig" element={<GigPage />} />
               <Route path="/contributions" element={<Contributions />} />
               <Route path="/contributions/new" element={<NewContribution />} />
+              <Route path="/attestations" element={<Attestations />} />
+              <Route path="/badges" element={<SkillBadges />} />
               <Route path="/rewards" element={<Rewards />} />
               <Route path="/rewards/:id" element={<RewardDetail />} />
               <Route path="/quests" element={<Quests />} />
               <Route path="/hackathons" element={<Hackathons />} />
               <Route path="/open-source" element={<OpenSource />} />
+              <Route path="/bug-bounties" element={<BugBounties />} />
+              <Route path="/bug-bounties/:id" element={<BugBountyDetail />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/discord" element={<Discord />} />
               <Route path="/profile/:username" element={<Profile />} />

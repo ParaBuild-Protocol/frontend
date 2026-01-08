@@ -18,6 +18,7 @@ export interface DashboardData {
   user: User;
   total_tokens: number;
   total_contributions: number;
+  total_attestations: number;
   verified_contributions: number;
   pending_contributions: number;
   rejected_contributions: number;
