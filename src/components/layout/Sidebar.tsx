@@ -12,20 +12,20 @@ import {
   ChevronRight,
   Sparkles,
   Code,
-  Users,
   MessageCircle,
   ChevronDown,
   User,
+  Award,
+  FileCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-// import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from "@/store/authStore";
 import { useState } from "react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { currentUser, currentUserStats } from "@/data/mockData";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -36,11 +36,14 @@ const mainNavItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { path: "/gig", label: "Gig", icon: User },
   { path: "/contributions", label: "Contributions", icon: FileText },
+  { path: "/attestations", label: "Attestations", icon: FileCheck },
+  { path: "/badges", label: "Skill Badges", icon: Award },
   { path: "/rewards", label: "Rewards", icon: Gift },
 ];
 
 const opportunityItems = [
   { path: "/hackathons", label: "Hackathons", icon: Sparkles },
+  { path: "/bug-bounties", label: "Bug Bounties", icon: Shield },
   { path: "/quests", label: "Quests", icon: Target },
   { path: "/open-source", label: "Open Source", icon: Code },
 ];
@@ -56,9 +59,7 @@ const bottomNavItems = [
 
 export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const location = useLocation();
-  // const { user, stats } = useAuth();
-  const user = currentUser;
-  const stats = currentUserStats;
+  const { user, stats } = useAuthStore();
   const [opportunitiesOpen, setOpportunitiesOpen] = useState(true);
   const [communityOpen, setCommunityOpen] = useState(true);
 
@@ -83,7 +84,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
           isCollapsed && "justify-center px-2",
           isActive
-            ? "bg-primary/10 text-primary"
+            ? "bg-primary/10 text-primary shadow-sm"
             : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground",
           className
         )}
@@ -96,7 +97,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
         />
         {!isCollapsed && <span>{item.label}</span>}
         {!isCollapsed && isActive && (
-          <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
+          <div className="ml-auto h-2 w-2 rounded-full bg-primary animate-pulse" />
         )}
       </Link>
     );
@@ -122,7 +123,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger
           className={cn(
-            "flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors",
+            "flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors hover:bg-sidebar-accent/30",
             hasActiveItem
               ? "text-primary"
               : "text-muted-foreground hover:text-foreground"
@@ -159,18 +160,18 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           )}
         >
           <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="w-12 h-12">
+            <div className="w-12 h-12 relative">
               <img
-                src="/logo.png"
+                src="/pb-logo.png"
                 alt="ParaBuild Logo"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain transition-opacity duration-200"
               />
             </div>
             {!isCollapsed && (
-              <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                 ParaBuild
               </span>
-            )} 
+            )}
           </Link>
           {!isCollapsed && (
             <button
@@ -184,21 +185,23 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
 
         {/* Token Balance Card */}
         {!isCollapsed && stats && (
-          <div className="mx-3 mt-4 rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 p-4">
-            <div className="flex items-center gap-3">
+          <div className="mx-3 mt-4 rounded-xl bg-linear-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 p-4 shadow-lg">
+            <div className="flex items-center gap-3 mb-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20">
                 <Coins className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Your Balance</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">
+                  Your Balance
+                </p>
                 <p className="text-lg font-bold font-mono text-primary">
                   {stats.totalPBUILD?.toLocaleString() || 0}
                 </p>
               </div>
             </div>
-            <div className="mt-3 flex items-center justify-between text-xs">
+            <div className="flex items-center justify-between text-xs pt-3 border-t border-primary/10">
               <span className="text-muted-foreground">$PBUILD Tokens</span>
-              <span className="text-primary font-medium">
+              <span className="text-primary font-semibold">
                 Rank #{stats.rank || "-"}
               </span>
             </div>
@@ -278,17 +281,18 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           {user && !isCollapsed && (
             <Link
               to={`/profile/${user.username}`}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 mt-2 bg-sidebar-accent/30 hover:bg-sidebar-accent/50 transition-colors"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 mt-2 bg-sidebar-accent/30 hover:bg-sidebar-accent/50 transition-colors group"
             >
-              <img
-                src={user.avatar}
-                alt={user.username}
-                className="h-8 w-8 rounded-full ring-2 ring-primary/20"
-              />
+              <div className="h-8 w-8 rounded-full bg-linear-to-br from-primary to-accent flex items-center justify-center text-sm font-bold text-white ring-2 ring-primary/20">
+                {user.username?.charAt(0).toUpperCase() || "B"}
+              </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{user.username}</p>
+                <p className="text-sm font-medium truncate group-hover:text-primary transition-colors">
+                  {user.username}
+                </p>
                 <p className="text-xs text-muted-foreground truncate font-mono">
-                  {user.address?.slice(0, 6)}...{user.address?.slice(-4)}
+                  {user.wallet_address?.slice(0, 6)}...
+                  {user.wallet_address?.slice(-4)}
                 </p>
               </div>
             </Link>

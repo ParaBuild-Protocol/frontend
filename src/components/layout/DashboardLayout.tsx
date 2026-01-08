@@ -1,15 +1,13 @@
-import { useState, useEffect } from 'react';
-import { Outlet, Navigate, useLocation } from 'react-router-dom';
-import { Sidebar } from './Sidebar';
-import { Header } from './Header';
-import { MobileNav } from './MobileNav';
-import { useAccount } from 'wagmi';
-// import { useAuth } from '@/context/AuthContext';
-import { cn } from '@/lib/utils';
+import { useState, useEffect } from "react";
+import { Outlet, Navigate, useLocation } from "react-router-dom";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { Header } from "@/components/layout/Header";
+import { MobileNav } from "@/components/layout/MobileNav";
+import { useAuthStore } from "@/store/authStore";
+import { cn } from "@/lib/utils";
 
 export function DashboardLayout() {
-  // const { isAuthenticated, isLoading } = useAuth();
-  const { isConnected } = useAccount();
+  const { isAuthenticated } = useAuthStore();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -24,8 +22,8 @@ export function DashboardLayout() {
     };
 
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   // Close mobile nav on route change
@@ -33,18 +31,20 @@ export function DashboardLayout() {
     setIsMobileNavOpen(false);
   }, [location.pathname]);
 
-  // if () {
+  // Loading state
+  // if (loading) {
   //   return (
   //     <div className="flex min-h-screen items-center justify-center bg-background">
   //       <div className="flex flex-col items-center gap-4">
   //         <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-  //         <p className="text-muted-foreground">Connecting wallet...</p>
+  //         <p className="text-muted-foreground">Loading your reputation...</p>
   //       </div>
   //     </div>
   //   );
   // }
 
-  if (!isConnected) {
+  // Redirect to landing if not authenticated
+  if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
 
@@ -59,13 +59,16 @@ export function DashboardLayout() {
       )}
 
       {/* Mobile Navigation */}
-      <MobileNav isOpen={isMobileNavOpen} onClose={() => setIsMobileNavOpen(false)} />
+      <MobileNav
+        isOpen={isMobileNavOpen}
+        onClose={() => setIsMobileNavOpen(false)}
+      />
 
       {/* Main Content */}
       <div
         className={cn(
-          'flex flex-col transition-all duration-300',
-          !isMobile && (isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64')
+          "flex flex-col transition-all duration-300",
+          !isMobile && (isSidebarCollapsed ? "lg:ml-16" : "lg:ml-64")
         )}
       >
         <Header
@@ -82,8 +85,8 @@ export function DashboardLayout() {
 
       {/* Background decoration */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
       </div>
     </div>
   );

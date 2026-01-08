@@ -1,4 +1,3 @@
-// store/authStore.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { BrowserProvider } from 'ethers';
@@ -15,6 +14,7 @@ interface User {
   github_url?: string;
   twitter_url?: string;
   discord_username?: string;
+  isAdmin?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -22,6 +22,7 @@ interface User {
 interface UserStats {
   totalPBUILD: number;
   totalContributions: number;
+  totalAttestations: number;
   verifiedContributions: number;
   pendingContributions: number;
   rank: number;
@@ -171,6 +172,7 @@ export const useAuthStore = create<AuthState>()(
           get().setStats({
             totalPBUILD: dashboard.total_tokens || 0,
             totalContributions: dashboard.total_contributions || 0,
+            totalAttestations: dashboard.total_attestations || 0,
             verifiedContributions: dashboard.verified_contributions || 0,
             pendingContributions: dashboard.pending_contributions || 0,
             rank: dashboard.rank || 0,
