@@ -1,7 +1,8 @@
-// store/uiStore.ts
+// store/uiStore.ts - Updated with proper typing
 import { create } from 'zustand';
 
-interface Notification {
+// Notification type (can be moved to types folder if needed elsewhere)
+export interface Notification {
   id: string;
   type: 'success' | 'error' | 'info' | 'warning';
   title: string;
@@ -48,7 +49,7 @@ interface UIState {
   setSearchQuery: (query: string) => void;
   
   // Actions - Notifications
-  addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => void;
+  addNotification: (notification: Omit<Notification, 'id' | 'read' | 'timestamp'>) => void;
   markNotificationAsRead: (id: string) => void;
   markAllNotificationsAsRead: () => void;
   clearNotifications: () => void;
@@ -90,7 +91,8 @@ export const useUIStore = create<UIState>((set, get) => ({
   addNotification: (notification) => {
     const newNotification: Notification = {
       ...notification,
-      id: `notif-${Date.now()}-${Math.random()}`,
+      id: `notif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      read: false,
       timestamp: new Date().toISOString(),
     };
     
@@ -101,12 +103,19 @@ export const useUIStore = create<UIState>((set, get) => ({
   },
   
   markNotificationAsRead: (id) => {
-    set((state) => ({
-      notifications: state.notifications.map((notif) =>
-        notif.id === id ? { ...notif, read: true } : notif
-      ),
-      unreadNotificationsCount: Math.max(0, state.unreadNotificationsCount - 1),
-    }));
+    set((state) => {
+      const notification = state.notifications.find((n) => n.id === id);
+      if (!notification || notification.read) {
+        return state; // No change if already read or not found
+      }
+      
+      return {
+        notifications: state.notifications.map((notif) =>
+          notif.id === id ? { ...notif, read: true } : notif
+        ),
+        unreadNotificationsCount: Math.max(0, state.unreadNotificationsCount - 1),
+      };
+    });
   },
   
   markAllNotificationsAsRead: () => {

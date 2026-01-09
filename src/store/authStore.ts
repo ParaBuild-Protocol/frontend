@@ -1,34 +1,11 @@
+// store/authStore.ts - Updated with centralized types
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { BrowserProvider } from 'ethers';
 import { authApi } from '@/lib/api/auth';
 import { userApi } from '@/lib/api/user';
 import { toast } from 'sonner';
-
-interface User {
-  id: string;
-  wallet_address: string;
-  username?: string;
-  bio?: string;
-  avatar?: string;
-  github_url?: string;
-  twitter_url?: string;
-  website_url?: string;
-  email?: string;
-  discord_username?: string;
-  isAdmin?: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-interface UserStats {
-  totalPBUILD: number;
-  totalContributions: number;
-  totalAttestations: number;
-  verifiedContributions: number;
-  pendingContributions: number;
-  rank: number;
-}
+import { User, UserStats, UpdateUserProfileDTO } from '@/types';
 
 interface AuthState {
   // State
@@ -57,7 +34,7 @@ interface AuthState {
   authenticate: (address: string, provider: BrowserProvider) => Promise<void>;
   fetchUserProfile: () => Promise<void>;
   fetchUserStats: () => Promise<void>;
-  updateProfile: (data: Partial<User>) => Promise<User>;
+  updateProfile: (data: UpdateUserProfileDTO) => Promise<User>;
   logout: () => void;
   
   // Initialize from localStorage
@@ -171,13 +148,13 @@ export const useAuthStore = create<AuthState>()(
 
         try {
           const dashboard = await userApi.getDashboard();
+          
+          // Map backend response to UserStats type
           get().setStats({
             totalPBUILD: dashboard.total_tokens || 0,
-            totalContributions: dashboard.total_contributions || 0,
-            totalAttestations: dashboard.total_attestations || 0,
-            verifiedContributions: dashboard.verified_contributions || 0,
-            pendingContributions: dashboard.pending_contributions || 0,
-            rank: dashboard.rank || 0,
+            contributions: dashboard.contributions || 0,
+            rank: dashboard.global_rank || 0,
+            totalPoints: dashboard.points_earned || 0,
           });
         } catch (err) {
           console.error('Failed to fetch stats:', err);
@@ -185,7 +162,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       // Update user profile
-      updateProfile: async (data: Partial<User>) => {
+      updateProfile: async (data: UpdateUserProfileDTO) => {
         try {
           const updated = await userApi.updateProfile(data);
           get().setUser(updated);

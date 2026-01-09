@@ -17,7 +17,6 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import Discord from "@/pages/Discord";
 
 interface User {
   id: string;
@@ -53,6 +52,12 @@ export const ProfileHeader = ({ user, isOwnProfile }: ProfileHeaderProps) => {
   const truncateAddress = (address: string) =>
     `${address.slice(0, 6)}...${address.slice(-4)}`;
 
+  // Display name: username if available, otherwise truncated address
+  const displayName = user.username || truncateAddress(user.wallet_address);
+  const avatarInitials = user.username
+    ? user.username.slice(0, 2).toUpperCase()
+    : user.wallet_address.slice(2, 4).toUpperCase();
+
   const socialLinks = [
     {
       icon: Github,
@@ -73,7 +78,7 @@ export const ProfileHeader = ({ user, isOwnProfile }: ProfileHeaderProps) => {
       color: "text-primary",
     },
     {
-      icon: Discord,
+      icon: Globe,
       url: user.discord_username
         ? `https://discord.com/users/${user.discord_username}`
         : undefined,
@@ -111,9 +116,9 @@ export const ProfileHeader = ({ user, isOwnProfile }: ProfileHeaderProps) => {
                 transition={{ duration: 0.3, delay: 0.2 }}
               >
                 <Avatar className="h-32 w-32 border-4 border-background shadow-xl ring-2 ring-primary/20">
-                  <AvatarImage src={user.avatar} alt={user.username} />
+                  <AvatarImage src={user.avatar} alt={displayName} />
                   <AvatarFallback className="text-3xl font-bold bg-linear-to-br from-primary to-accent text-primary-foreground">
-                    {user.username.slice(0, 2).toUpperCase()}
+                    {avatarInitials}
                   </AvatarFallback>
                 </Avatar>
               </motion.div>
@@ -122,7 +127,7 @@ export const ProfileHeader = ({ user, isOwnProfile }: ProfileHeaderProps) => {
               <div className="flex-1 sm:pb-2">
                 <div className="flex items-center gap-3 flex-wrap mb-2">
                   <h1 className="text-3xl font-bold font-display">
-                    {user.username}
+                    {displayName}
                   </h1>
                   {user.isAdmin && (
                     <Badge className="bg-primary/20 text-primary border-primary/30">
@@ -151,7 +156,7 @@ export const ProfileHeader = ({ user, isOwnProfile }: ProfileHeaderProps) => {
                   <Calendar className="w-4 h-4" />
                   <span>
                     Joined{" "}
-                    {user.created_at.toLocaleDateString("en-US", {
+                    {new Date(user.created_at).toLocaleDateString("en-US", {
                       month: "long",
                       year: "numeric",
                     })}

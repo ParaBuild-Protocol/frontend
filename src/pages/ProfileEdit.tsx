@@ -36,9 +36,9 @@ import { motion } from "framer-motion";
 interface FormErrors {
   username?: string;
   bio?: string;
-  github_url?: string;
-  twitter_url?: string;
-  website_url?: string;
+  github?: string;
+  twitter?: string;
+  website?: string;
   email?: string;
 }
 
@@ -107,9 +107,9 @@ const ProfileEdit = () => {
 
     newErrors.username = validateUsername(formData.username);
     newErrors.bio = validateBio(formData.bio);
-    newErrors.github_url = validateUrl(formData.github, "GitHub");
-    newErrors.twitter_url = validateUrl(formData.twitter, "Twitter");
-    newErrors.website_url = validateUrl(formData.website, "website");
+    newErrors.github = validateUrl(formData.github, "GitHub");
+    newErrors.twitter = validateUrl(formData.twitter, "Twitter");
+    newErrors.website = validateUrl(formData.website, "website");
     newErrors.email = validateEmail(formData.email);
 
     // Filter out undefined errors
@@ -145,7 +145,8 @@ const ProfileEdit = () => {
       navigate(`/profile/${formData.username}`);
     } catch (error) {
       toast.error("Failed to update profile", {
-        description: error instanceof Error ? error.message : "An unknown error occurred",
+        description:
+          error instanceof Error ? error.message : "An unknown error occurred",
       });
     } finally {
       setIsSubmitting(false);
@@ -191,7 +192,9 @@ const ProfileEdit = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold font-display mb-2">Edit Profile</h1>
+            <h1 className="text-4xl font-bold font-display mb-2">
+              Edit Profile
+            </h1>
             <p className="text-muted-foreground">
               Update your profile information and social links
             </p>
@@ -239,7 +242,12 @@ const ProfileEdit = () => {
                     <li>• JPG, PNG, or GIF format</li>
                     <li>• Maximum file size: 5MB</li>
                   </ul>
-                  <Button type="button" variant="outline" size="sm" className="mt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-4"
+                  >
                     Upload New Picture
                   </Button>
                 </div>
@@ -268,7 +276,9 @@ const ProfileEdit = () => {
                 <Input
                   id="username"
                   value={formData.username}
-                  onChange={(e) => handleFieldChange("username", e.target.value)}
+                  onChange={(e) =>
+                    handleFieldChange("username", e.target.value)
+                  }
                   className={`bg-background ${
                     errors.username ? "border-destructive" : ""
                   }`}
@@ -336,7 +346,10 @@ const ProfileEdit = () => {
             <CardContent className="space-y-6">
               {/* GitHub */}
               <div className="space-y-2">
-                <Label htmlFor="github" className="text-base flex items-center gap-2">
+                <Label
+                  htmlFor="github"
+                  className="text-base flex items-center gap-2"
+                >
                   <Github className="w-4 h-4" />
                   GitHub
                 </Label>
@@ -345,21 +358,24 @@ const ProfileEdit = () => {
                   value={formData.github}
                   onChange={(e) => handleFieldChange("github", e.target.value)}
                   className={`bg-background ${
-                    errors.github_url ? "border-destructive" : ""
+                    errors.github ? "border-destructive" : ""
                   }`}
                   placeholder="https://github.com/username"
                 />
-                {errors.github_url && (
+                {errors.github && (
                   <div className="flex items-center gap-2 text-sm text-destructive">
                     <AlertCircle className="w-4 h-4" />
-                    <span>{errors.github_url}</span>
+                    <span>{errors.github}</span>
                   </div>
                 )}
               </div>
 
               {/* Twitter */}
               <div className="space-y-2">
-                <Label htmlFor="twitter" className="text-base flex items-center gap-2">
+                <Label
+                  htmlFor="twitter"
+                  className="text-base flex items-center gap-2"
+                >
                   <Twitter className="w-4 h-4" />
                   Twitter
                 </Label>
@@ -368,21 +384,24 @@ const ProfileEdit = () => {
                   value={formData.twitter}
                   onChange={(e) => handleFieldChange("twitter", e.target.value)}
                   className={`bg-background ${
-                    errors.twitter_url ? "border-destructive" : ""
+                    errors.twitter ? "border-destructive" : ""
                   }`}
                   placeholder="https://twitter.com/handle"
                 />
-                {errors.twitter_url && (
+                {errors.twitter && (
                   <div className="flex items-center gap-2 text-sm text-destructive">
                     <AlertCircle className="w-4 h-4" />
-                    <span>{errors.twitter_url}</span>
+                    <span>{errors.twitter}</span>
                   </div>
                 )}
               </div>
 
               {/* Website */}
               <div className="space-y-2">
-                <Label htmlFor="website" className="text-base flex items-center gap-2">
+                <Label
+                  htmlFor="website"
+                  className="text-base flex items-center gap-2"
+                >
                   <Globe className="w-4 h-4" />
                   Website
                 </Label>
@@ -391,21 +410,24 @@ const ProfileEdit = () => {
                   value={formData.website}
                   onChange={(e) => handleFieldChange("website", e.target.value)}
                   className={`bg-background ${
-                    errors.website_url ? "border-destructive" : ""
+                    errors.website ? "border-destructive" : ""
                   }`}
                   placeholder="https://yourwebsite.com"
                 />
-                {errors.website_url && (
+                {errors.website && (
                   <div className="flex items-center gap-2 text-sm text-destructive">
                     <AlertCircle className="w-4 h-4" />
-                    <span>{errors.website_url}</span>
+                    <span>{errors.website}</span>
                   </div>
                 )}
               </div>
 
               {/* Email */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-base flex items-center gap-2">
+                <Label
+                  htmlFor="email"
+                  className="text-base flex items-center gap-2"
+                >
                   <Mail className="w-4 h-4" />
                   Email
                 </Label>
@@ -440,7 +462,10 @@ const ProfileEdit = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 Wallet Address
-                <Badge variant="secondary" className="bg-success/10 text-success">
+                <Badge
+                  variant="secondary"
+                  className="bg-success/10 text-success"
+                >
                   <CheckCircle2 className="w-3 h-3 mr-1" />
                   Connected
                 </Badge>
@@ -452,8 +477,8 @@ const ProfileEdit = () => {
                 {user.wallet_address}
               </div>
               <p className="text-sm text-muted-foreground mt-3">
-                Wallet address cannot be changed. To use a different wallet, please
-                disconnect and connect with the new wallet.
+                Wallet address cannot be changed. To use a different wallet,
+                please disconnect and connect with the new wallet.
               </p>
             </CardContent>
           </Card>

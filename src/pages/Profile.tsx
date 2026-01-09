@@ -15,21 +15,21 @@ import { ContributionsList } from "@/components/profile/ContributionsList";
 import { AchievementsBadges } from "@/components/profile/AchievementsBadges";
 
 const Profile = () => {
-  const { username } = useParams();
+  const { address } = useParams();
   const { user: authUser } = useAuthStore();
   
   // Fallback to mock data if auth store is not populated
   const currentAuthUser = authUser || currentUser;
 
-  // Find the profile user
+  // Find the profile user by wallet address (primary identifier)
   const user =
-    username === currentAuthUser.username
+    address?.toLowerCase() === currentAuthUser.wallet_address?.toLowerCase()
       ? currentAuthUser
-      : mockUsers.find((u) => u.username === username);
+      : mockUsers.find((u) => u.wallet_address?.toLowerCase() === address?.toLowerCase());
 
-  const isOwnProfile = currentAuthUser?.id === user?.id;
+  const isOwnProfile = currentAuthUser?.wallet_address?.toLowerCase() === user?.wallet_address?.toLowerCase();
   const stats = isOwnProfile ? currentUserStats : currentUserStats;
-
+  console.log('authUser', authUser)
   // User not found
   if (!user) {
     return (
