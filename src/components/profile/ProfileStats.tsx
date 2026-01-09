@@ -1,7 +1,8 @@
-// components/profile/ProfileStats.tsx
+// components/profile/ProfileStats.tsx - Updated with centralized types
 import { Card, CardContent } from "@/components/ui/card";
 import { LucideIcon, Coins, Target, Trophy, Gift } from "lucide-react";
 import { motion } from "framer-motion";
+import { UserStats } from "@/types";
 
 interface StatCardProps {
   icon: LucideIcon;
@@ -34,12 +35,7 @@ const StatCard = ({ icon: Icon, value, label, iconColor, delay = 0 }: StatCardPr
 );
 
 interface ProfileStatsProps {
-  stats: {
-    totalPBUILD: number;
-    contributions: number;
-    rank: number;
-    totalPoints: number;
-  };
+  stats: UserStats;
 }
 
 export const ProfileStats = ({ stats }: ProfileStatsProps) => {

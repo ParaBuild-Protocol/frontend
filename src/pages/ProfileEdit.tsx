@@ -1,4 +1,4 @@
-// pages/ProfileEdit.tsx - Professional Profile Edit Page
+// pages/ProfileEdit.tsx - Updated with centralized types
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -22,47 +22,46 @@ import {
   Camera,
   Github,
   Twitter,
-  Globe,
-  Mail,
   AlertCircle,
   CheckCircle2,
   X,
+  MessageCircle,
 } from "lucide-react";
-import { currentUser } from "@/data/mockData";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { UpdateUserProfileDTO, getUserInitials } from "@/types";
 
 interface FormErrors {
   username?: string;
   bio?: string;
-  github?: string;
-  twitter?: string;
-  website?: string;
+  github_url?: string;
+  twitter_url?: string;
+  website_url?: string;
   email?: string;
+  discord_username?: string;
 }
 
 const ProfileEdit = () => {
   const navigate = useNavigate();
-  const { user: authUser } = useAuthStore();
-  const user = authUser || currentUser;
+  const { user, updateProfile } = useAuthStore();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isDirty, setIsDirty] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<UpdateUserProfileDTO>({
     username: user?.username || "",
     bio: user?.bio || "",
-    github: user?.github_url || "",
-    twitter: user?.twitter_url || "",
-    website: user?.website_url || "",
-    email: user?.email || "",
+    github_url: user?.github_url || "",
+    twitter_url: user?.twitter_url || "",
+    discord_username: user?.discord_username || "",
+    profile_picture: user?.profile_picture || "",
   });
 
   // Validation functions
-  const validateUsername = (username: string): string | undefined => {
-    if (!username.trim()) return "Username is required";
+  const validateUsername = (username?: string): string | undefined => {
+    if (!username || !username.trim()) return undefined; // Optional field
     if (username.length < 3) return "Username must be at least 3 characters";
     if (username.length > 30) return "Username must be less than 30 characters";
     if (!/^[a-zA-Z0-9_-]+$/.test(username))
@@ -70,13 +69,14 @@ const ProfileEdit = () => {
     return undefined;
   };
 
-  const validateBio = (bio: string): string | undefined => {
+  const validateBio = (bio?: string): string | undefined => {
+    if (!bio) return undefined;
     if (bio.length > 160) return "Bio must be less than 160 characters";
     return undefined;
   };
 
-  const validateUrl = (url: string, fieldName: string): string | undefined => {
-    if (!url) return undefined; // Optional field
+  const validateUrl = (url?: string, fieldName?: string): string | undefined => {
+    if (!url || !url.trim()) return undefined; // Optional field
     try {
       new URL(url);
       return undefined;
@@ -85,15 +85,16 @@ const ProfileEdit = () => {
     }
   };
 
-  const validateEmail = (email: string): string | undefined => {
-    if (!email) return undefined; // Optional field
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) return "Please enter a valid email address";
+  const validateDiscordUsername = (username?: string): string | undefined => {
+    if (!username || !username.trim()) return undefined; // Optional field
+    // Discord username can be: username or username#1234
+    if (username.length < 2) return "Discord username must be at least 2 characters";
+    if (username.length > 32) return "Discord username must be less than 32 characters";
     return undefined;
   };
 
   // Handle field changes
-  const handleFieldChange = (field: keyof typeof formData, value: string) => {
+  const handleFieldChange = (field: keyof UpdateUserProfileDTO, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setIsDirty(true);
 
@@ -107,15 +108,14 @@ const ProfileEdit = () => {
 
     newErrors.username = validateUsername(formData.username);
     newErrors.bio = validateBio(formData.bio);
-    newErrors.github = validateUrl(formData.github, "GitHub");
-    newErrors.twitter = validateUrl(formData.twitter, "Twitter");
-    newErrors.website = validateUrl(formData.website, "website");
-    newErrors.email = validateEmail(formData.email);
+    newErrors.github_url = validateUrl(formData.github_url, "GitHub");
+    newErrors.twitter_url = validateUrl(formData.twitter_url, "Twitter");
+    newErrors.discord_username = validateDiscordUsername(formData.discord_username);
 
     // Filter out undefined errors
     const filteredErrors = Object.fromEntries(
       Object.entries(newErrors).filter(([_, v]) => v !== undefined)
-    );
+    ) as FormErrors;
 
     setErrors(filteredErrors);
     return Object.keys(filteredErrors).length === 0;
@@ -133,21 +133,18 @@ const ProfileEdit = () => {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Filter out empty strings
+      const cleanedData = Object.fromEntries(
+        Object.entries(formData).filter(([_, v]) => v && v.trim() !== "")
+      ) as UpdateUserProfileDTO;
 
-      // Update would happen here
-      toast.success("Profile updated successfully!", {
-        description: "Your changes have been saved.",
-      });
+      await updateProfile(cleanedData);
 
       setIsDirty(false);
-      navigate(`/profile/${formData.username}`);
+      navigate(`/profile/${user?.wallet_address}`);
     } catch (error) {
-      toast.error("Failed to update profile", {
-        description:
-          error instanceof Error ? error.message : "An unknown error occurred",
-      });
+      // Error is already handled by updateProfile in store
+      console.error("Profile update error:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -182,6 +179,8 @@ const ProfileEdit = () => {
   if (!user) {
     return null;
   }
+
+  const initials = getUserInitials(user);
 
   return (
     <div className="max-w-3xl mx-auto space-y-8 pb-8">
@@ -223,9 +222,9 @@ const ProfileEdit = () => {
               <div className="flex items-center gap-8">
                 <div className="relative group">
                   <Avatar className="h-32 w-32 border-4 border-background shadow-xl">
-                    <AvatarImage src={user.avatar} />
+                    <AvatarImage src={user.profile_picture} />
                     <AvatarFallback className="text-3xl font-bold bg-linear-to-br from-primary to-accent text-primary-foreground">
-                      {user?.username?.slice(0, 2).toUpperCase()}
+                      {initials}
                     </AvatarFallback>
                   </Avatar>
                   <button
@@ -271,14 +270,12 @@ const ProfileEdit = () => {
               {/* Username */}
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-base">
-                  Username <span className="text-destructive">*</span>
+                  Username
                 </Label>
                 <Input
                   id="username"
-                  value={formData.username}
-                  onChange={(e) =>
-                    handleFieldChange("username", e.target.value)
-                  }
+                  value={formData.username || ""}
+                  onChange={(e) => handleFieldChange("username", e.target.value)}
                   className={`bg-background ${
                     errors.username ? "border-destructive" : ""
                   }`}
@@ -305,7 +302,7 @@ const ProfileEdit = () => {
                 </Label>
                 <Textarea
                   id="bio"
-                  value={formData.bio}
+                  value={formData.bio || ""}
                   onChange={(e) => handleFieldChange("bio", e.target.value)}
                   className={`bg-background min-h-30 ${
                     errors.bio ? "border-destructive" : ""
@@ -323,7 +320,7 @@ const ProfileEdit = () => {
                       Brief description for your profile
                     </p>
                   )}
-                  {getCharCount(formData.bio, 160)}
+                  {getCharCount(formData.bio || "", 160)}
                 </div>
               </div>
             </CardContent>
@@ -346,105 +343,69 @@ const ProfileEdit = () => {
             <CardContent className="space-y-6">
               {/* GitHub */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="github"
-                  className="text-base flex items-center gap-2"
-                >
+                <Label htmlFor="github" className="text-base flex items-center gap-2">
                   <Github className="w-4 h-4" />
                   GitHub
                 </Label>
                 <Input
                   id="github"
-                  value={formData.github}
-                  onChange={(e) => handleFieldChange("github", e.target.value)}
+                  value={formData.github_url || ""}
+                  onChange={(e) => handleFieldChange("github_url", e.target.value)}
                   className={`bg-background ${
-                    errors.github ? "border-destructive" : ""
+                    errors.github_url ? "border-destructive" : ""
                   }`}
                   placeholder="https://github.com/username"
                 />
-                {errors.github && (
+                {errors.github_url && (
                   <div className="flex items-center gap-2 text-sm text-destructive">
                     <AlertCircle className="w-4 h-4" />
-                    <span>{errors.github}</span>
+                    <span>{errors.github_url}</span>
                   </div>
                 )}
               </div>
 
               {/* Twitter */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="twitter"
-                  className="text-base flex items-center gap-2"
-                >
+                <Label htmlFor="twitter" className="text-base flex items-center gap-2">
                   <Twitter className="w-4 h-4" />
                   Twitter
                 </Label>
                 <Input
                   id="twitter"
-                  value={formData.twitter}
-                  onChange={(e) => handleFieldChange("twitter", e.target.value)}
+                  value={formData.twitter_url || ""}
+                  onChange={(e) => handleFieldChange("twitter_url", e.target.value)}
                   className={`bg-background ${
-                    errors.twitter ? "border-destructive" : ""
+                    errors.twitter_url ? "border-destructive" : ""
                   }`}
                   placeholder="https://twitter.com/handle"
                 />
-                {errors.twitter && (
+                {errors.twitter_url && (
                   <div className="flex items-center gap-2 text-sm text-destructive">
                     <AlertCircle className="w-4 h-4" />
-                    <span>{errors.twitter}</span>
+                    <span>{errors.twitter_url}</span>
                   </div>
                 )}
               </div>
 
-              {/* Website */}
+              {/* Discord */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="website"
-                  className="text-base flex items-center gap-2"
-                >
-                  <Globe className="w-4 h-4" />
-                  Website
+                <Label htmlFor="discord" className="text-base flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4" />
+                  Discord
                 </Label>
                 <Input
-                  id="website"
-                  value={formData.website}
-                  onChange={(e) => handleFieldChange("website", e.target.value)}
+                  id="discord"
+                  value={formData.discord_username || ""}
+                  onChange={(e) => handleFieldChange("discord_username", e.target.value)}
                   className={`bg-background ${
-                    errors.website ? "border-destructive" : ""
+                    errors.discord_username ? "border-destructive" : ""
                   }`}
-                  placeholder="https://yourwebsite.com"
+                  placeholder="username#1234 or username"
                 />
-                {errors.website && (
+                {errors.discord_username && (
                   <div className="flex items-center gap-2 text-sm text-destructive">
                     <AlertCircle className="w-4 h-4" />
-                    <span>{errors.website}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Email */}
-              <div className="space-y-2">
-                <Label
-                  htmlFor="email"
-                  className="text-base flex items-center gap-2"
-                >
-                  <Mail className="w-4 h-4" />
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleFieldChange("email", e.target.value)}
-                  className={`bg-background ${
-                    errors.email ? "border-destructive" : ""
-                  }`}
-                  placeholder="your@email.com"
-                />
-                {errors.email && (
-                  <div className="flex items-center gap-2 text-sm text-destructive">
-                    <AlertCircle className="w-4 h-4" />
-                    <span>{errors.email}</span>
+                    <span>{errors.discord_username}</span>
                   </div>
                 )}
               </div>
@@ -462,10 +423,7 @@ const ProfileEdit = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 Wallet Address
-                <Badge
-                  variant="secondary"
-                  className="bg-success/10 text-success"
-                >
+                <Badge variant="secondary" className="bg-success/10 text-success">
                   <CheckCircle2 className="w-3 h-3 mr-1" />
                   Connected
                 </Badge>

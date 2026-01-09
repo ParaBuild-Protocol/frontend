@@ -1,4 +1,4 @@
-// components/profile/ProfileHeader.tsx
+// components/profile/ProfileHeader.tsx - Updated with centralized types
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -8,31 +8,15 @@ import {
   Edit,
   Github,
   Twitter,
-  Globe,
   Calendar,
   Copy,
   CheckCircle2,
-  Mail,
+  MessageCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-
-interface User {
-  id: string;
-  wallet_address: string;
-  username?: string;
-  bio?: string;
-  avatar?: string;
-  github_url?: string;
-  twitter_url?: string;
-  website_url?: string;
-  email?: string;
-  discord_username?: string;
-  isAdmin?: boolean;
-  created_at: string;
-  updated_at: string;
-}
+import { User, formatAddress, getUserDisplayName, getUserInitials, formatDate } from "@/types";
 
 interface ProfileHeaderProps {
   user: User;
@@ -49,14 +33,9 @@ export const ProfileHeader = ({ user, isOwnProfile }: ProfileHeaderProps) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const truncateAddress = (address: string) =>
-    `${address.slice(0, 6)}...${address.slice(-4)}`;
-
-  // Display name: username if available, otherwise truncated address
-  const displayName = user.username || truncateAddress(user.wallet_address);
-  const avatarInitials = user.username
-    ? user.username.slice(0, 2).toUpperCase()
-    : user.wallet_address.slice(2, 4).toUpperCase();
+  // Get display values using utility functions
+  const displayName = getUserDisplayName(user);
+  const avatarInitials = getUserInitials(user);
 
   const socialLinks = [
     {
@@ -72,24 +51,12 @@ export const ProfileHeader = ({ user, isOwnProfile }: ProfileHeaderProps) => {
       color: "text-blue-500",
     },
     {
-      icon: Globe,
-      url: user.website_url,
-      label: "Website",
-      color: "text-primary",
-    },
-    {
-      icon: Globe,
+      icon: MessageCircle,
       url: user.discord_username
         ? `https://discord.com/users/${user.discord_username}`
         : undefined,
       label: "Discord",
       color: "text-indigo-500",
-    },
-    {
-      icon: Mail,
-      url: user.email ? `mailto:${user.email}` : undefined,
-      label: "Email",
-      color: "text-accent",
     },
   ];
 
@@ -116,7 +83,7 @@ export const ProfileHeader = ({ user, isOwnProfile }: ProfileHeaderProps) => {
                 transition={{ duration: 0.3, delay: 0.2 }}
               >
                 <Avatar className="h-32 w-32 border-4 border-background shadow-xl ring-2 ring-primary/20">
-                  <AvatarImage src={user.avatar} alt={displayName} />
+                  <AvatarImage src={user.profile_picture} alt={displayName} />
                   <AvatarFallback className="text-3xl font-bold bg-linear-to-br from-primary to-accent text-primary-foreground">
                     {avatarInitials}
                   </AvatarFallback>
@@ -129,7 +96,7 @@ export const ProfileHeader = ({ user, isOwnProfile }: ProfileHeaderProps) => {
                   <h1 className="text-3xl font-bold font-display">
                     {displayName}
                   </h1>
-                  {user.isAdmin && (
+                  {user.role === "admin" && (
                     <Badge className="bg-primary/20 text-primary border-primary/30">
                       <CheckCircle2 className="w-3 h-3 mr-1" />
                       Verified
@@ -143,7 +110,7 @@ export const ProfileHeader = ({ user, isOwnProfile }: ProfileHeaderProps) => {
                   className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-mono text-sm group"
                   title="Click to copy address"
                 >
-                  <span>{truncateAddress(user.wallet_address)}</span>
+                  <span>{formatAddress(user.wallet_address)}</span>
                   {copied ? (
                     <CheckCircle2 className="w-4 h-4 text-success" />
                   ) : (
@@ -155,11 +122,7 @@ export const ProfileHeader = ({ user, isOwnProfile }: ProfileHeaderProps) => {
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
                   <Calendar className="w-4 h-4" />
                   <span>
-                    Joined{" "}
-                    {new Date(user.created_at).toLocaleDateString("en-US", {
-                      month: "long",
-                      year: "numeric",
-                    })}
+                    Joined {formatDate(user.created_at)}
                   </span>
                 </div>
               </div>

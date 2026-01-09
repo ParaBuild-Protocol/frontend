@@ -1,22 +1,11 @@
-// components/profile/ContributionsList.tsx
+// components/profile/ContributionsList.tsx - Updated with centralized types
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Coins, Target, ExternalLink, Clock, CheckCircle2, XCircle, Timer } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-
-interface Contribution {
-  id: string;
-  projectName: string;
-  description: string;
-  status: "approved" | "pending" | "rejected";
-  tokensAwarded: number;
-  submittedAt: Date;
-  category?: string;
-  tags?: string[];
-  verificationUrl?: string;
-}
+import { Contribution, ContributionStatus, formatRelativeTime } from "@/types";
 
 interface ContributionsListProps {
   contributions: Contribution[];
@@ -50,23 +39,30 @@ export const ContributionsList = ({ contributions, isOwnProfile }: Contributions
     );
   }
 
-  const getStatusConfig = (status: Contribution["status"]) => {
+  const getStatusConfig = (status: ContributionStatus) => {
     const configs = {
-      approved: {
+      [ContributionStatus.APPROVED]: {
         icon: CheckCircle2,
         color: "text-success",
         bgColor: "bg-success/10",
         borderColor: "border-success/30",
         label: "Approved",
       },
-      pending: {
+      [ContributionStatus.PENDING]: {
         icon: Timer,
         color: "text-warning",
         bgColor: "bg-warning/10",
         borderColor: "border-warning/30",
+        label: "Pending",
+      },
+      [ContributionStatus.PENDING_REVIEW]: {
+        icon: Timer,
+        color: "text-blue-500",
+        bgColor: "bg-blue-500/10",
+        borderColor: "border-blue-500/30",
         label: "Pending Review",
       },
-      rejected: {
+      [ContributionStatus.REJECTED]: {
         icon: XCircle,
         color: "text-destructive",
         bgColor: "bg-destructive/10",
@@ -77,19 +73,6 @@ export const ContributionsList = ({ contributions, isOwnProfile }: Contributions
     return configs[status];
   };
 
-  const formatDate = (date: Date) => {
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return "Today";
-    if (diffDays === 1) return "Yesterday";
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-    return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
-  };
-
   return (
     <div className="space-y-4">
       {contributions.map((contribution, index) => {
@@ -98,7 +81,7 @@ export const ContributionsList = ({ contributions, isOwnProfile }: Contributions
 
         return (
           <motion.div
-            key={contribution.id}
+            key={contribution._id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
@@ -108,17 +91,15 @@ export const ContributionsList = ({ contributions, isOwnProfile }: Contributions
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                   {/* Main Content */}
                   <div className="flex-1 min-w-0">
-                    {/* Title & Category */}
+                    {/* Title */}
                     <div className="flex items-start gap-3 mb-2">
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-lg mb-1 group-hover:text-primary transition-colors truncate">
-                          {contribution.projectName}
+                          {contribution.name}
                         </h3>
-                        {contribution.category && (
-                          <Badge variant="outline" className="mb-2">
-                            {contribution.category}
-                          </Badge>
-                        )}
+                        <Badge variant="outline" className="mb-2">
+                          {contribution.type}
+                        </Badge>
                       </div>
                     </div>
 
@@ -126,21 +107,6 @@ export const ContributionsList = ({ contributions, isOwnProfile }: Contributions
                     <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed mb-3">
                       {contribution.description}
                     </p>
-
-                    {/* Tags */}
-                    {contribution.tags && contribution.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {contribution.tags.map((tag) => (
-                          <Badge
-                            key={tag}
-                            variant="secondary"
-                            className="bg-primary/5 text-primary border-primary/20 text-xs"
-                          >
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
 
                     {/* Metadata */}
                     <div className="flex flex-wrap items-center gap-4 text-sm">
@@ -158,13 +124,13 @@ export const ContributionsList = ({ contributions, isOwnProfile }: Contributions
                       {/* Date */}
                       <div className="flex items-center gap-1 text-muted-foreground">
                         <Clock className="w-4 h-4" />
-                        <span>{formatDate(contribution.submittedAt)}</span>
+                        <span>{formatRelativeTime(contribution.created_at)}</span>
                       </div>
 
                       {/* Verification Link */}
-                      {contribution.verificationUrl && (
+                      {contribution.proof_url && (
                         <a
-                          href={contribution.verificationUrl}
+                          href={contribution.proof_url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
@@ -177,12 +143,12 @@ export const ContributionsList = ({ contributions, isOwnProfile }: Contributions
                   </div>
 
                   {/* Tokens Awarded */}
-                  {contribution.tokensAwarded > 0 && (
+                  {contribution.tokens_won > 0 && (
                     <div className="flex flex-col items-end gap-2">
                       <div className="flex items-center gap-2 text-primary font-semibold">
                         <Coins className="w-5 h-5" />
                         <span className="text-2xl font-mono">
-                          +{contribution.tokensAwarded.toLocaleString()}
+                          +{contribution.tokens_won.toLocaleString()}
                         </span>
                       </div>
                       <span className="text-xs text-muted-foreground">$PBUILD earned</span>

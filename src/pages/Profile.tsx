@@ -1,11 +1,11 @@
-// pages/Profile.tsx - Professional Profile Page
+// pages/Profile.tsx - Updated with centralized types
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft } from "lucide-react";
-import { mockUsers, mockContributions, currentUser, currentUserStats } from "@/data/mockData";
 import { useAuthStore } from "@/store/authStore";
 import { motion } from "framer-motion";
+import { User, UserStats, addressesMatch } from "@/types";
 
 // Import new modular components
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
@@ -14,22 +14,42 @@ import { ActivityHeatmap } from "@/components/profile/ActivityHeatmap";
 import { ContributionsList } from "@/components/profile/ContributionsList";
 import { AchievementsBadges } from "@/components/profile/AchievementsBadges";
 
+// Mock data types (should be replaced with API calls)
+// interface MockUser extends User {
+//   id: string;
+//   joinedAt?: Date;
+// }
+
+interface MockContribution {
+  id: string;
+  userId: string;
+  projectName: string;
+  description: string;
+  status: "approved" | "pending" | "rejected";
+  tokensAwarded: number;
+  submittedAt: Date;
+  category?: string;
+  tags?: string[];
+  verificationUrl?: string;
+}
+
+// TODO: Replace with actual API calls
+// const mockUsers: MockUser[] = [];
+const mockContributions: MockContribution[] = [];
+
 const Profile = () => {
-  const { address } = useParams();
-  const { user: authUser } = useAuthStore();
-  
-  // Fallback to mock data if auth store is not populated
-  const currentAuthUser = authUser || currentUser;
+  // const { address } = useParams<{ address: string }>();
+  const { user, stats: authStats } = useAuthStore();
 
   // Find the profile user by wallet address (primary identifier)
-  const user =
-    address?.toLowerCase() === currentAuthUser.wallet_address?.toLowerCase()
-      ? currentAuthUser
-      : mockUsers.find((u) => u.wallet_address?.toLowerCase() === address?.toLowerCase());
+  // const user: MockUser | undefined =
+  //   authUser
+  //     ? { ...authUser, id: authUser._id, joinedAt: new Date(authUser.created_at) }
+  //     : mockUsers.find((u) => addressesMatch(u.wallet_address, address));
 
-  const isOwnProfile = currentAuthUser?.wallet_address?.toLowerCase() === user?.wallet_address?.toLowerCase();
-  const stats = isOwnProfile ? currentUserStats : currentUserStats;
-  console.log('authUser', authUser)
+  // const isOwnProfile = authUser && user && addressesMatch(authUser.wallet_address, user.wallet_address);
+  const isOwnProfile = true;
+
   // User not found
   if (!user) {
     return (
@@ -62,16 +82,16 @@ const Profile = () => {
     );
   }
 
-  // Get user contributions
+  // Get user contributions (TODO: Replace with API call)
   const userContributions = mockContributions.filter((c) => c.userId === user.id);
   const approvedContributions = userContributions.filter((c) => c.status === "approved");
 
   // Stats for ProfileStats component
-  const profileStats = {
-    totalPBUILD: stats?.totalPBUILD || 0,
+  const profileStats: UserStats = {
+    totalPBUILD: authStats?.totalPBUILD || 0,
     contributions: approvedContributions.length,
-    rank: stats?.rank || 0,
-    totalPoints: stats?.totalPoints || 0,
+    rank: authStats?.rank || 0,
+    totalPoints: authStats?.totalPoints || 0,
   };
 
   return (
@@ -92,7 +112,7 @@ const Profile = () => {
       )}
 
       {/* Profile Header */}
-      <ProfileHeader user={user} isOwnProfile={isOwnProfile} />
+      <ProfileHeader user={user} isOwnProfile={!!isOwnProfile} />
 
       {/* Stats Grid */}
       <ProfileStats stats={profileStats} />
@@ -126,7 +146,7 @@ const Profile = () => {
           <TabsContent value="contributions" className="mt-6">
             <ContributionsList
               contributions={userContributions}
-              isOwnProfile={isOwnProfile}
+              isOwnProfile={!!isOwnProfile}
             />
           </TabsContent>
 
