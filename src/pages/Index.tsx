@@ -1,7 +1,9 @@
+// pages/LandingPage.tsx - Professional ParaBuild Landing Page
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
   Code2,
+  Trophy,
   Gift,
   Users,
   Github,
@@ -12,12 +14,19 @@ import {
   ExternalLink,
   CheckCircle2,
   TrendingUp,
-  Badge,
+  Shield,
   FileCheck,
   Boxes,
   Award,
+  Zap,
+  Lock,
+  Globe,
+  Terminal,
+  Coins,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   useAppKit,
   useAppKitAccount,
@@ -30,8 +39,8 @@ import { useState, useEffect, useRef } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuthStore } from "@/store/authStore";
 import { BrowserProvider } from "ethers";
-import { Card, CardContent } from "@/components/ui/card";
 
+// Theme-aware Bifrost Vortex implementation
 const getThemeColors = () => {
   const rootStyles = getComputedStyle(document.documentElement);
   const isDark =
@@ -134,95 +143,6 @@ class BifrostParticle {
   }
 }
 
-// Token logos with proper SVG paths
-const TokenIcon = ({
-  symbol,
-  className = "",
-}: {
-  symbol: string;
-  className?: string;
-}) => {
-  const icons = {
-    ETH: (
-      <svg viewBox="0 0 32 32" className={className}>
-        <g fill="none" fillRule="evenodd">
-          <circle cx="16" cy="16" r="16" fill="#627EEA" />
-          <g fill="#FFF" fillRule="nonzero">
-            <path fillOpacity=".602" d="M16.498 4v8.87l7.497 3.35z" />
-            <path d="M16.498 4L9 16.22l7.498-3.35z" />
-            <path fillOpacity=".602" d="M16.498 21.968v6.027L24 17.616z" />
-            <path d="M16.498 27.995v-6.028L9 17.616z" />
-            <path
-              fillOpacity=".2"
-              d="M16.498 20.573l7.497-4.353-7.497-3.348z"
-            />
-            <path fillOpacity=".602" d="M9 16.22l7.498 4.353v-7.701z" />
-          </g>
-        </g>
-      </svg>
-    ),
-    BTC: (
-      <svg viewBox="0 0 32 32" className={className}>
-        <g fill="none" fillRule="evenodd">
-          <circle cx="16" cy="16" r="16" fill="#F7931A" />
-          <path
-            fill="#FFF"
-            fillRule="nonzero"
-            d="M23.189 14.02c.314-2.096-1.283-3.223-3.465-3.975l.708-2.84-1.728-.43-.69 2.765c-.454-.114-.92-.22-1.385-.326l.695-2.783L15.596 6l-.708 2.839c-.376-.086-.746-.17-1.104-.26l.002-.009-2.384-.595-.46 1.846s1.283.294 1.256.312c.7.175.826.638.805 1.006l-.806 3.235c.048.012.11.03.18.057l-.183-.045-1.13 4.532c-.086.212-.303.531-.793.41.018.025-1.256-.313-1.256-.313l-.858 1.978 2.25.561c.418.105.828.215 1.231.318l-.715 2.872 1.727.43.708-2.84c.472.127.93.245 1.378.357l-.706 2.828 1.728.43.715-2.866c2.948.558 5.164.333 6.097-2.333.752-2.146-.037-3.385-1.588-4.192 1.13-.26 1.98-1.003 2.207-2.538zm-3.95 5.538c-.533 2.147-4.148.986-5.32.695l.95-3.805c1.172.293 4.929.872 4.37 3.11zm.535-5.569c-.487 1.953-3.495.96-4.47.717l.86-3.45c.975.243 4.118.696 3.61 2.733z"
-          />
-        </g>
-      </svg>
-    ),
-    SOL: (
-      <svg viewBox="0 0 32 32" className={className}>
-        <g fill="none">
-          <circle cx="16" cy="16" r="16" fill="#66F9A1" />
-          <path
-            fill="#FFF"
-            d="M8.5 19.5l3-3c.2-.2.4-.3.7-.3h11.3c.5 0 .7.6.4 1l-3 3c-.2.2-.4.3-.7.3H8.9c-.5 0-.7-.6-.4-1zm0-7l3-3c.2-.2.4-.3.7-.3h11.3c.5 0 .7.6.4 1l-3 3c-.2.2-.4.3-.7.3H8.9c-.5 0-.7-.6-.4-1zm11.3 3.5H8.5c-.5 0-.7.6-.4 1l3 3c.2.2.4.3.7.3h11.3c.5 0 .7-.6.4-1l-3-3c-.2-.2-.4-.3-.7-.3z"
-          />
-        </g>
-      </svg>
-    ),
-    MATIC: (
-      <svg viewBox="0 0 32 32" className={className}>
-        <g fill="none">
-          <circle cx="16" cy="16" r="16" fill="#8247E5" />
-          <path
-            fill="#FFF"
-            d="M21.092 12.693c-.369-.215-.848-.215-1.254 0l-2.879 1.654-1.955 1.078-2.879 1.653c-.369.216-.848.216-1.254 0l-2.288-1.294c-.369-.215-.627-.61-.627-1.042V12.19c0-.431.221-.826.627-1.042l2.25-1.258c.37-.216.85-.216 1.256 0l2.25 1.258c.37.216.628.611.628 1.042v1.654l1.955-1.115v-1.653a1.16 1.16 0 00-.627-1.042l-4.17-2.372c-.369-.216-.848-.216-1.254 0l-4.244 2.372A1.16 1.16 0 006 11.076v4.78c0 .432.221.827.627 1.043l4.244 2.372c.369.215.849.215 1.254 0l2.879-1.618 1.955-1.114 2.879-1.617c.369-.216.848-.216 1.254 0l2.251 1.258c.37.215.627.61.627 1.042v2.552c0 .431-.22.826-.627 1.042l-2.25 1.294c-.37.216-.85.216-1.255 0l-2.251-1.258c-.37-.216-.628-.611-.628-1.042v-1.654l-1.955 1.115v1.653c0 .431.221.827.627 1.042l4.244 2.372c.369.216.848.216 1.254 0l4.244-2.372c.369-.215.627-.61.627-1.042v-4.78a1.16 1.16 0 00-.627-1.042l-4.28-2.409z"
-          />
-        </g>
-      </svg>
-    ),
-    ARB: (
-      <svg viewBox="0 0 32 32" className={className}>
-        <g fill="none">
-          <circle cx="16" cy="16" r="16" fill="#28A0F0" />
-          <path
-            fill="#FFF"
-            d="M16.5 8l-1.2 2.8-2.8 6.5 1.4 3.2h5.2l1.4-3.2-2.8-6.5L16.5 8zm-4.8 10.5l-2.2-5.1 1.8-4.2 2.4 5.6-2 3.7zm9.6 0l-2-3.7 2.4-5.6 1.8 4.2-2.2 5.1z"
-          />
-        </g>
-      </svg>
-    ),
-    OP: (
-      <svg viewBox="0 0 32 32" className={className}>
-        <g fill="none">
-          <circle cx="16" cy="16" r="16" fill="#FF0420" />
-          <path
-            fill="#FFF"
-            d="M13.8 10.5c-2.3 0-3.8 1.5-3.8 3.8 0 2.3 1.5 3.8 3.8 3.8h.6c1.2 0 2-.7 2-1.8 0-1.1-.8-1.8-2-1.8h-.6c-.7 0-1.2-.4-1.2-1.2s.5-1.2 1.2-1.2h.6c.7 0 1.2.4 1.2 1.2h2.6c0-2.3-1.5-3.8-3.8-3.8h-.6zm8.4 0c-2.3 0-3.8 1.5-3.8 3.8v3.8h2.6v-1.2h2.4v1.2h2.6v-3.8c0-2.3-1.5-3.8-3.8-3.8zm0 2.6c.7 0 1.2.4 1.2 1.2v.6h-2.4v-.6c0-.8.5-1.2 1.2-1.2z"
-          />
-        </g>
-      </svg>
-    ),
-  };
-
-  return icons[symbol] || icons.ETH;
-};
-
-// Bifrost-style Animated Vortex Component with theme-aware colors
 const BifrostVortex = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -401,72 +321,14 @@ const BifrostVortex = () => {
   );
 };
 
-// Floating protocol icons with animation
-const FloatingIcon = ({
-  children,
-  className = "",
-  delay = 0,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-}) => (
-  <motion.div
-    className={`absolute rounded-xl bg-surface/60 backdrop-blur-md border border-border/30 flex items-center justify-center shadow-2xl hover:scale-110 hover:border-primary/40 transition-all duration-300 ${className}`}
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{
-      duration: 0.6,
-      delay,
-      repeat: Infinity,
-      repeatType: "reverse",
-      repeatDelay: 3,
-    }}
-    style={{
-      animation: `float 6s ease-in-out infinite`,
-      animationDelay: `${delay}s`,
-    }}
-  >
-    {children}
-  </motion.div>
-);
-
-// Feature card with icon
-// const FeatureCard = ({ icon: Icon, title, description, delay = 0 }) => (
-//   <motion.div
-//     initial={{ opacity: 0, y: 20 }}
-//     whileInView={{ opacity: 1, y: 0 }}
-//     viewport={{ once: true }}
-//     transition={{ duration: 0.5, delay }}
-//     className="group relative p-6 rounded-2xl border border-border/50 bg-surface/30 backdrop-blur-sm hover:bg-surface/50 hover:border-primary/30 transition-all duration-300"
-//   >
-//     <div className="flex items-start gap-4">
-//       <div className="shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-//         <Icon className="w-6 h-6 text-primary" />
-//       </div>
-//       <div>
-//         <h3 className="font-semibold text-lg mb-2">{title}</h3>
-//         <p className="text-sm text-muted-foreground leading-relaxed">
-//           {description}
-//         </p>
-//       </div>
-//     </div>
-//   </motion.div>
-// );
-
 export default function LandingPage() {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const { open } = useAppKit();
 
-  // Get wallet state
   const { address, isConnected } = useAppKitAccount();
   const { walletProvider } = useAppKitProvider("eip155");
-
-  // Get auth state from Zustand
   const { isAuthenticated, authenticating, authenticate } = useAuthStore();
-
-  // Track if we've already triggered auth
   const authTriggeredRef = useRef(false);
 
   useEffect(() => {
@@ -475,15 +337,6 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // AUTO-NAVIGATE: When authenticated, go to dashboard
-  // useEffect(() => {
-  //   if (isAuthenticated) {
-  //     console.log("✅ Authenticated! Navigating to dashboard...");
-  //     navigate("/dashboard");
-  //   }
-  // }, [isAuthenticated, navigate]);
-
-  // AUTO-AUTHENTICATE: When wallet connects, immediately trigger sign message
   useEffect(() => {
     const shouldAuthenticate =
       isConnected &&
@@ -491,83 +344,65 @@ export default function LandingPage() {
       address &&
       walletProvider &&
       !authenticating &&
-      !authTriggeredRef.current; // Prevent duplicate triggers
+      !authTriggeredRef.current;
 
     if (shouldAuthenticate) {
-      console.log("🔐 Wallet connected! Auto-triggering authentication...");
-      authTriggeredRef.current = true; // Mark as triggered
-
+      authTriggeredRef.current = true;
       const triggerAuth = async () => {
         try {
           toast.info("Please sign the message to authenticate...");
           const provider = new BrowserProvider(walletProvider);
           await authenticate(address, provider);
-          console.log("✅ Authentication successful!");
           navigate("/dashboard");
         } catch (error) {
-          console.error("❌ Authentication failed:", error);
-          authTriggeredRef.current = false; // Reset so user can try again
+          console.error("Authentication failed:", error);
+          authTriggeredRef.current = false;
         }
       };
-
-      // Small delay to ensure wallet provider is ready
       const timer = setTimeout(triggerAuth, 300);
       return () => clearTimeout(timer);
     }
 
-    // Reset auth trigger flag when wallet disconnects
     if (!isConnected) {
       authTriggeredRef.current = false;
     }
-  }, [
-    isConnected,
-    isAuthenticated,
-    address,
-    walletProvider,
-    authenticating,
-    authenticate,
-  ]);
+  }, [isConnected, isAuthenticated, address, walletProvider, authenticating, authenticate, navigate]);
 
   const handleConnect = async () => {
-    // If already authenticated, navigate to dashboard
     if (isAuthenticated) {
       navigate("/dashboard");
       return;
     }
 
-    // If connected but not authenticated, manually trigger sign
-    if (isConnected && !isAuthenticated && address && walletProvider) {
+    if (isConnected && !isAuthenticated && address && walletProvider && !authenticating) {
       try {
         toast.info("Please sign the message to authenticate...");
         const provider = new BrowserProvider(walletProvider);
         await authenticate(address, provider);
-        // Navigation happens automatically via useEffect
       } catch (error) {
         console.error("Authentication failed:", error);
       }
       return;
     }
 
-    // If not connected, open wallet modal
     if (!isConnected) {
       open();
-      return;
     }
   };
+
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
-      {/* Enhanced Background with Gradient Mesh */}
+    <div className="min-h-screen bg-background">
+      {/* Gradient Background */}
       <div className="fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-primary/10 via-background to-background" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,var(--tw-gradient-stops))] from-accent/5 via-transparent to-transparent" />
-        <div className="absolute inset-0 opacity-[0.015] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIvPjwvc3ZnPg==')]" />
       </div>
 
-      {/* Enhanced Header */}
+      {/* Header */}
       <motion.header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-lg"
+            ? "bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-sm"
             : "bg-transparent"
         }`}
         initial={{ y: -100 }}
@@ -575,67 +410,61 @@ export default function LandingPage() {
         transition={{ duration: 0.5 }}
       >
         <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-1">
-            <div className="w-14 h-14">
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10">
               <img
                 src="/pb-logo.png"
-                alt="ParaBuild Logo"
+                alt="ParaBuild"
                 className="w-full h-full object-contain"
               />
             </div>
-            <span className="font-display text-xl font-bold bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            <span className="font-display text-xl font-bold tracking-tight">
               ParaBuild
             </span>
           </div>
 
           <nav className="hidden md:flex items-center gap-8">
-            <a
-              href="#features"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Features
+            <a href="#platform" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Platform
             </a>
-            <a
-              href="#quests"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Quests
+            <a href="#architecture" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Architecture
             </a>
-            <a
-              href="#how-it-works"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              How it Works
+            <a href="#for-builders" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              For Builders
+            </a>
+            <a href="#integration" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Integration
             </a>
           </nav>
 
           <div className="flex items-center gap-4">
             <ThemeToggle />
             <Button
-              variant="ghost"
               size="sm"
               onClick={handleConnect}
               disabled={authenticating}
+              className="gap-2"
             >
               {authenticating ? (
                 <>
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                  Authenticating...
+                  Authenticating
                 </>
               ) : isAuthenticated ? (
                 <>
-                  Enter App
-                  <ChevronRight className="h-5 w-5" />
+                  Dashboard
+                  <ChevronRight className="h-4 w-4" />
                 </>
               ) : isConnected ? (
                 <>
                   Sign Message
-                  <Wallet className="h-5 w-5" />
+                  <Wallet className="h-4 w-4" />
                 </>
               ) : (
                 <>
                   Connect Wallet
-                  <Wallet className="h-5 w-5" />
+                  <Wallet className="h-4 w-4" />
                 </>
               )}
             </Button>
@@ -643,112 +472,58 @@ export default function LandingPage() {
         </div>
       </motion.header>
 
-      {/* Enhanced Hero Section with Vortex Background */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center pt-24 pb-16 overflow-hidden">
-        {/* Vortex Animation as Background */}
-        <div className="absolute inset-0 z-0 opacity-60">
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
+        <div className="absolute inset-0 z-0 opacity-50">
           <BifrostVortex />
         </div>
 
-        {/* Floating Token Icons */}
-        <FloatingIcon
-          className="h-16 w-16 top-[15%] left-[8%] p-2 z-10"
-          delay={0}
-        >
-          <TokenIcon symbol="ETH" className="w-full h-full" />
-        </FloatingIcon>
-
-        <FloatingIcon
-          className="h-14 w-14 top-[20%] left-[18%] p-2 z-10"
-          delay={0.5}
-        >
-          <TokenIcon symbol="BTC" className="w-full h-full" />
-        </FloatingIcon>
-
-        <FloatingIcon
-          className="h-16 w-16 top-[12%] right-[10%] p-2 z-10"
-          delay={1}
-        >
-          <TokenIcon symbol="SOL" className="w-full h-full" />
-        </FloatingIcon>
-
-        <FloatingIcon
-          className="h-14 w-14 top-[25%] right-[18%] p-2 z-10"
-          delay={1.5}
-        >
-          <TokenIcon symbol="MATIC" className="w-full h-full" />
-        </FloatingIcon>
-
-        <FloatingIcon
-          className="h-16 w-16 top-[40%] right-[8%] p-2 z-10"
-          delay={2}
-        >
-          <TokenIcon symbol="ARB" className="w-full h-full" />
-        </FloatingIcon>
-
-        <FloatingIcon
-          className="h-14 w-14 bottom-[35%] right-[12%] p-2 z-10"
-          delay={2.5}
-        >
-          <TokenIcon symbol="OP" className="w-full h-full" />
-        </FloatingIcon>
-
-        <FloatingIcon
-          className="h-14 w-14 bottom-[40%] left-[12%] p-2 z-10"
-          delay={3}
-        >
-          <TokenIcon symbol="ETH" className="w-full h-full" />
-        </FloatingIcon>
-
-        {/* Main Hero Content */}
-        <div className="relative z-20 text-center max-w-5xl mx-auto px-4">
+        <div className="relative z-10 container text-center py-24">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
+            className="max-w-5xl mx-auto"
           >
-            {/* Badge */}
-            <motion.div
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8 backdrop-blur-sm"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">
-                Web3's Contribution Economy
-              </span>
-            </motion.div>
+            <Badge variant="outline" className="mb-6 border-primary/20 bg-primary/5 px-4 py-1.5">
+              <Shield className="w-3 h-3 mr-2" />
+              Onchain Reputation Infrastructure
+            </Badge>
 
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-linear-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent font-display leading-tight">
-              Build Beyond.
-              <br />
-              <span className="bg-linear-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
-                ParaBuild.
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 tracking-tight">
+              <span className="block mb-2">The Reputation Layer</span>
+              <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                for Web3 Builders
               </span>
             </h1>
 
-            {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-              Transform your Web3 contributions into verifiable, portable,
-              onchain reputation. The composable primitive for developer
-              credibility.
+            <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
+              Transform verifiable contributions into portable, composable reputation.
+              <span className="block mt-2 font-medium text-foreground">
+                The primitive infrastructure for merit-based credibility.
+              </span>
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
               <Button
                 size="lg"
                 onClick={handleConnect}
-                className="gap-2 px-8 h-12 text-base shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/30 transition-all backdrop-blur-sm"
+                disabled={authenticating}
+                className="gap-2 px-8 h-14 text-lg"
               >
-                {isConnected ? (
+                {authenticating ? (
+                  <>
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Authenticating...
+                  </>
+                ) : isAuthenticated ? (
                   <>
                     Enter Dashboard
                     <ChevronRight className="h-5 w-5" />
                   </>
                 ) : (
                   <>
-                    Connect Wallet
+                    Get Started
                     <Wallet className="h-5 w-5" />
                   </>
                 )}
@@ -757,213 +532,125 @@ export default function LandingPage() {
               <Button
                 size="lg"
                 variant="outline"
-                onClick={() =>
-                  document
-                    .getElementById("how-it-works")
-                    ?.scrollIntoView({ behavior: "smooth" })
-                }
-                className="gap-2 px-8 h-12 text-base border-border/50 hover:border-primary/30 backdrop-blur-sm"
+                className="gap-2 px-8 h-14 text-lg"
+                asChild
               >
-                How it Works
-                <ExternalLink className="h-4 w-4" />
+                <a href="https://docs.parabuild.xyz" target="_blank" rel="noopener noreferrer">
+                  Documentation
+                  <ExternalLink className="h-5 w-5" />
+                </a>
               </Button>
             </div>
 
             {/* Trust Indicators */}
-            <div className="flex items-center justify-center gap-8 mt-12 text-sm text-muted-foreground backdrop-blur-sm">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-500" />
-                <span>On-Chain Verified</span>
+            <div className="flex flex-wrap items-center justify-center gap-8 text-sm">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <CheckCircle2 className="w-4 h-4 text-success" />
+                <span>EAS Protocol Integration</span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-500" />
-                <span>10K+ Builders</span>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <CheckCircle2 className="w-4 h-4 text-success" />
+                <span>Ethereum Mainnet</span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-500" />
-                <span>$5M+ Earned</span>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <CheckCircle2 className="w-4 h-4 text-success" />
+                <span>Open Source</span>
               </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Features Section
-      <section
-        id="features"
-        className="py-24 md:py-32 border-t border-border/30"
-      >
+      {/* Platform Overview */}
+      <section id="platform" className="py-32 border-t border-border/30">
         <div className="container">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <motion.p
-              className="text-sm text-primary font-semibold uppercase tracking-wider mb-4"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-            >
-              Why ParaBuild
-            </motion.p>
-            <motion.h2
-              className="font-display text-3xl md:text-5xl font-bold mb-6"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              Turn Your Contributions Into{" "}
-              <span className="text-primary">Lasting Value</span>
-            </motion.h2>
-            <motion.p
-              className="text-muted-foreground text-lg"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-            >
-              The first platform where your Web3 contributions compound into
-              real rewards
-            </motion.p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <FeatureCard
-              icon={Trophy}
-              title="On-Chain Reputation"
-              description="Every contribution is verified and recorded on-chain. Build a permanent, composable record of your achievements."
-              delay={0}
-            />
-            <FeatureCard
-              icon={Code2}
-              title="Automated Verification"
-              description="Connect your GitHub, hackathon accounts, and let our system automatically verify your contributions."
-              delay={0.1}
-            />
-            <FeatureCard
-              icon={Gift}
-              title="Real Rewards"
-              description="Redeem $PBUILD tokens for exclusive merch, conference tickets, tool subscriptions, and more."
-              delay={0.2}
-            />
-            <FeatureCard
-              icon={Target}
-              title="Daily Quests"
-              description="Complete daily and weekly quests to earn bonus tokens and level up your profile."
-              delay={0.3}
-            />
-            <FeatureCard
-              icon={TrendingUp}
-              title="Leaderboards"
-              description="Compete with other builders globally. Top contributors unlock exclusive benefits and recognition."
-              delay={0.4}
-            />
-            <FeatureCard
-              icon={Users}
-              title="Global Community"
-              description="Join 10,000+ builders from India, SEA, LatAm, and beyond who are earning rewards daily."
-              delay={0.5}
-            />
-          </div>
-        </div>
-      </section> */}
-
-      {/* Features Section */}
-      <section className="py-24 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <Badge variant="outline" className="mb-4">
-              Core Features
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 font-display">
-              Reputation Infrastructure for the Onchain Future
+          <div className="max-w-3xl mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 font-display">
+              A New Primitive for <span className="text-primary">Developer Reputation</span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              ParaBuild transforms contributions into verifiable credentials,
-              creating a composable reputation primitive.
+            <p className="text-xl text-muted-foreground leading-relaxed">
+              ParaBuild creates verifiable, onchain attestations from developer contributions—
+              building a composable reputation layer that travels with builders across the Web3 ecosystem.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Feature 1: Onchain Reputation */}
-            <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl">
-              <CardContent className="pt-6">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                  <TrendingUp className="w-6 h-6 text-primary" />
+          <div className="grid lg:grid-cols-3 gap-8">
+            <Card className="border-2 border-border/50 hover:border-primary/30 transition-all">
+              <CardContent className="pt-8 pb-8">
+                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6">
+                  <Shield className="w-7 h-7 text-primary" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3">Onchain Reputation</h3>
-                <p className="text-muted-foreground mb-4">
-                  Your contributions become verifiable reputation scores stored
-                  permanently onchain. Merit-based, transparent, and
-                  tamper-proof.
+                <h3 className="text-2xl font-bold mb-4">Verifiable Attestations</h3>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  Every contribution generates cryptographically signed attestations via Ethereum Attestation Service (EAS).
+                  Immutable, portable, and universally verifiable.
                 </p>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                    <span>Quality, recency, and diversity scoring</span>
+                <ul className="space-y-3 text-sm">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <span className="text-muted-foreground">Standards-compliant EAS schema implementation</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                    <span>Skill-based reputation tracking</span>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <span className="text-muted-foreground">On-chain permanent storage with IPFS backup</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                    <span>Time-decayed reputation algorithm</span>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <span className="text-muted-foreground">Cross-platform credential portability</span>
                   </li>
                 </ul>
               </CardContent>
             </Card>
 
-            {/* Feature 2: EAS Attestations */}
-            <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl">
-              <CardContent className="pt-6">
-                <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4">
-                  <FileCheck className="w-6 h-6 text-accent" />
+            <Card className="border-2 border-border/50 hover:border-primary/30 transition-all">
+              <CardContent className="pt-8 pb-8">
+                <div className="w-14 h-14 rounded-xl bg-accent/10 flex items-center justify-center mb-6">
+                  <TrendingUp className="w-7 h-7 text-accent" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3">EAS Attestations</h3>
-                <p className="text-muted-foreground mb-4">
-                  Every verified contribution becomes an Ethereum Attestation
-                  Service (EAS) attestation—cryptographically signed and
-                  verifiable.
+                <h3 className="text-2xl font-bold mb-4">Dynamic Reputation Scoring</h3>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  Sophisticated algorithms evaluate contribution quality, recency, and diversity—
+                  creating a holistic reputation score that reflects genuine expertise.
                 </p>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-accent mt-0.5 shrink-0" />
-                    <span>Industry-standard credentials</span>
+                <ul className="space-y-3 text-sm">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+                    <span className="text-muted-foreground">Multi-dimensional quality assessment</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-accent mt-0.5 shrink-0" />
-                    <span>Verifiable onchain proof</span>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+                    <span className="text-muted-foreground">Time-decay for sustained contribution incentives</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-accent mt-0.5 shrink-0" />
-                    <span>Composable with Web3 ecosystem</span>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+                    <span className="text-muted-foreground">Skill-specific reputation tracking</span>
                   </li>
                 </ul>
               </CardContent>
             </Card>
 
-            {/* Feature 3: Composability */}
-            <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl">
-              <CardContent className="pt-6">
-                <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center mb-4">
-                  <Boxes className="w-6 h-6 text-success" />
+            <Card className="border-2 border-border/50 hover:border-primary/30 transition-all">
+              <CardContent className="pt-8 pb-8">
+                <div className="w-14 h-14 rounded-xl bg-success/10 flex items-center justify-center mb-6">
+                  <Boxes className="w-7 h-7 text-success" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3">Composable APIs</h3>
-                <p className="text-muted-foreground mb-4">
-                  ParaBuild is the reputation primitive for Web3. DAOs,
-                  protocols, and platforms can integrate reputation into their
-                  systems.
+                <h3 className="text-2xl font-bold mb-4">Composable Integration</h3>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  Built as infrastructure for the ecosystem. DAOs, protocols, and platforms
+                  integrate reputation data through standardized APIs and smart contracts.
                 </p>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-success mt-0.5 shrink-0" />
-                    <span>GraphQL API for reputation queries</span>
+                <ul className="space-y-3 text-sm">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-success shrink-0 mt-0.5" />
+                    <span className="text-muted-foreground">GraphQL API for reputation queries</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-success mt-0.5 shrink-0" />
-                    <span>Embeddable reputation widgets</span>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-success shrink-0 mt-0.5" />
+                    <span className="text-muted-foreground">Smart contract integration patterns</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-success mt-0.5 shrink-0" />
-                    <span>Protocol integrations (DAOs, grants)</span>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-success shrink-0 mt-0.5" />
+                    <span className="text-muted-foreground">Embeddable reputation widgets</span>
                   </li>
                 </ul>
               </CardContent>
@@ -972,456 +659,389 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section id="how-it-works" className="py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <Badge variant="outline" className="mb-4">
-              Simple Process
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 font-display">
-              How ParaBuild Works
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Five steps to transform your contributions into portable,
-              verifiable reputation.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-5 gap-6">
-            {/* Step 1 */}
-            <div className="relative">
-              <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-2xl font-bold text-primary">
-                  1
-                </div>
-                <h3 className="font-semibold mb-2">Connect Wallet</h3>
-                <p className="text-sm text-muted-foreground">
-                  Sign in with your Web3 wallet using Reown AppKit
-                </p>
-              </div>
-              {/* Arrow */}
-              <div className="hidden md:block absolute top-8 left-full w-full">
-                <ArrowRight className="w-6 h-6 text-muted-foreground/30 mx-auto" />
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div className="relative">
-              <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-2xl font-bold text-primary">
-                  2
-                </div>
-                <h3 className="font-semibold mb-2">Submit Work</h3>
-                <p className="text-sm text-muted-foreground">
-                  Add your hackathon wins, bounties, or open-source
-                  contributions
-                </p>
-              </div>
-              <div className="hidden md:block absolute top-8 left-full w-full">
-                <ArrowRight className="w-6 h-6 text-muted-foreground/30 mx-auto" />
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="relative">
-              <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-2xl font-bold text-primary">
-                  3
-                </div>
-                <h3 className="font-semibold mb-2">Get Verified</h3>
-                <p className="text-sm text-muted-foreground">
-                  Verifiers review and approve your contributions
-                </p>
-              </div>
-              <div className="hidden md:block absolute top-8 left-full w-full">
-                <ArrowRight className="w-6 h-6 text-muted-foreground/30 mx-auto" />
-              </div>
-            </div>
-
-            {/* Step 4 */}
-            <div className="relative">
-              <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-2xl font-bold text-primary">
-                  4
-                </div>
-                <h3 className="font-semibold mb-2">Earn Attestations</h3>
-                <p className="text-sm text-muted-foreground">
-                  Receive EAS attestations stored permanently onchain
-                </p>
-              </div>
-              <div className="hidden md:block absolute top-8 left-full w-full">
-                <ArrowRight className="w-6 h-6 text-muted-foreground/30 mx-auto" />
-              </div>
-            </div>
-
-            {/* Step 5 */}
-            <div>
-              <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-2xl font-bold text-primary">
-                  5
-                </div>
-                <h3 className="font-semibold mb-2">Build Reputation</h3>
-                <p className="text-sm text-muted-foreground">
-                  Grow your score, earn badges, and use reputation anywhere
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Use Cases Section */}
-      <section className="py-24 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <Badge variant="outline" className="mb-4">
-              Use Cases
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 font-display">
-              Reputation for Every Builder
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Use Case 1 */}
-            <Card>
-              <CardContent className="pt-6">
-                <Code2 className="w-10 h-10 text-primary mb-4" />
-                <h3 className="text-xl font-bold mb-3">For Developers</h3>
-                <p className="text-muted-foreground">
-                  Build a verifiable resume from your Web3 work. Showcase
-                  hackathon wins, bounties, and open-source contributions with
-                  cryptographic proof.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Use Case 2 */}
-            <Card>
-              <CardContent className="pt-6">
-                <Users className="w-10 h-10 text-primary mb-4" />
-                <h3 className="text-xl font-bold mb-3">For DAOs</h3>
-                <p className="text-muted-foreground">
-                  Make informed decisions based on reputation. Use ParaBuild
-                  scores for grant decisions, governance weight, or contributor
-                  access.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Use Case 3 */}
-            <Card>
-              <CardContent className="pt-6">
-                <Award className="w-10 h-10 text-primary mb-4" />
-                <h3 className="text-xl font-bold mb-3">For Protocols</h3>
-                <p className="text-muted-foreground">
-                  Integrate reputation into your platform. Reward top builders,
-                  identify skilled contributors, or gate features by reputation
-                  score.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Mission Section - Enhanced */}
-      <section className="py-24 md:py-32 border-t border-border/30">
+      {/* Architecture Section */}
+      <section id="architecture" className="py-32 border-t border-border/30 bg-muted/20">
         <div className="container">
-          <motion.div
-            className="max-w-4xl mx-auto text-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <p className="text-sm text-primary font-semibold uppercase tracking-wider mb-6">
-              Our Mission
-            </p>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-8">
-              <span className="text-foreground">We imagine a world where </span>
-              <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
-                builders' contributions
-              </span>
-              <span className="text-foreground"> are valued more than </span>
-              <span className="text-muted-foreground">capital investments</span>
+          <div className="max-w-3xl mb-16">
+            <Badge variant="outline" className="mb-4">
+              System Architecture
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 font-display">
+              Built on <span className="text-primary">Production-Grade Infrastructure</span>
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              For Web3 to reach its next stage of growth, tokens should be in
-              the hands of the builders and contributors rather than
-              concentrated in the wallets of passive investors. ParaBuild is
-              building that future.
+            <p className="text-xl text-muted-foreground leading-relaxed">
+              ParaBuild combines decentralized attestation protocols with scalable verification systems
+              to create a robust reputation layer for Web3.
             </p>
-          </motion.div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
+            <Card>
+              <CardContent className="pt-8 pb-8">
+                <Terminal className="w-10 h-10 text-primary mb-4" />
+                <h3 className="text-xl font-bold mb-3">Attestation Layer</h3>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <p>• EAS Protocol for attestation generation and storage</p>
+                  <p>• Ethereum mainnet for immutable credential anchoring</p>
+                  <p>• IPFS for decentralized metadata storage</p>
+                  <p>• Multi-sig verification for high-value attestations</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-8 pb-8">
+                <Globe className="w-10 h-10 text-accent mb-4" />
+                <h3 className="text-xl font-bold mb-3">Verification Infrastructure</h3>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <p>• Automated GitHub integration for PR verification</p>
+                  <p>• ETHGlobal API for hackathon validation</p>
+                  <p>• Smart contract interaction analysis</p>
+                  <p>• Community-driven peer review system</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-8 pb-8">
+                <Lock className="w-10 h-10 text-success mb-4" />
+                <h3 className="text-xl font-bold mb-3">Security & Privacy</h3>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <p>• Zero-knowledge proof support for sensitive data</p>
+                  <p>• Selective disclosure of reputation attributes</p>
+                  <p>• Encrypted off-chain metadata with on-chain hashes</p>
+                  <p>• Multi-chain credential verification</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-8 pb-8">
+                <Code2 className="w-10 h-10 text-warning mb-4" />
+                <h3 className="text-xl font-bold mb-3">Integration Layer</h3>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <p>• RESTful and GraphQL API endpoints</p>
+                  <p>• Smart contract libraries for Solidity/Vyper</p>
+                  <p>• React/Vue components for frontend integration</p>
+                  <p>• Webhook support for real-time updates</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+            <CardContent className="pt-8 pb-8 text-center">
+              <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h3 className="text-2xl font-bold mb-3">Open Source & Audited</h3>
+              <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
+                All core smart contracts are open source and have undergone comprehensive security audits.
+                Community contributions welcome.
+              </p>
+              <Button variant="outline" className="gap-2" asChild>
+                <a href="https://github.com/ParaBuild-Protocol" target="_blank" rel="noopener noreferrer">
+                  <Github className="w-4 h-4" />
+                  View on GitHub
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
-      {/* Enhanced Stats Section */}
-      <section className="py-20 border-t border-border/30 bg-surface/20">
+      {/* For Builders */}
+      <section id="for-builders" className="py-32 border-t border-border/30">
         <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+          <div className="max-w-3xl mb-16">
+            <Badge variant="outline" className="mb-4">
+              For Developers
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 font-display">
+              Build Your <span className="text-primary">Professional Identity</span>
+            </h2>
+            <p className="text-xl text-muted-foreground leading-relaxed">
+              Every contribution you make—from hackathon wins to open source commits—becomes part
+              of your verifiable professional record.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 mb-16">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="pt-6">
+                <Trophy className="w-10 h-10 text-warning mb-4" />
+                <h3 className="text-xl font-bold mb-3">Hackathon Achievements</h3>
+                <p className="text-muted-foreground text-sm">
+                  Automatically verify and attest hackathon wins from ETHGlobal,
+                  Devfolio, and other platforms.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="pt-6">
+                <Code2 className="w-10 h-10 text-blue-500 mb-4" />
+                <h3 className="text-xl font-bold mb-3">Open Source Contributions</h3>
+                <p className="text-muted-foreground text-sm">
+                  Merged PRs, code reviews, and issue resolutions tracked and
+                  converted into reputation.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="pt-6">
+                <Coins className="w-10 h-10 text-success mb-4" />
+                <h3 className="text-xl font-bold mb-3">Bug Bounties</h3>
+                <p className="text-muted-foreground text-sm">
+                  Security vulnerability discoveries verified and added to your
+                  credential portfolio.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="border-2">
+            <CardContent className="pt-8 pb-8">
+              <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                  <h3 className="text-3xl font-bold mb-4">Skill-Based NFT Badges</h3>
+                  <p className="text-muted-foreground mb-6 leading-relaxed">
+                    As you build reputation in specific domains, unlock tiered NFT badges
+                    (Bronze, Silver, Gold, Platinum) that serve as visual proof of expertise.
+                  </p>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-amber-600" />
+                      <span><span className="font-semibold">Bronze:</span> 10+ contributions, 70% quality</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-gray-400" />
+                      <span><span className="font-semibold">Silver:</span> 50+ contributions, 80% quality</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                      <span><span className="font-semibold">Gold:</span> 100+ contributions, 90% quality</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-purple-500" />
+                      <span><span className="font-semibold">Platinum:</span> 200+ contributions, 95% quality</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center">
+                  <Award className="w-64 h-64 text-primary/20" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Integration */}
+      <section id="integration" className="py-32 border-t border-border/30 bg-muted/20">
+        <div className="container">
+          <div className="max-w-3xl mx-auto text-center mb-16">
+            <Badge variant="outline" className="mb-4">
+              Ecosystem Integration
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 font-display">
+              For DAOs, Protocols & <span className="text-primary">Platforms</span>
+            </h2>
+            <p className="text-xl text-muted-foreground leading-relaxed">
+              Integrate verifiable reputation data into your decision-making processes,
+              governance systems, and contributor programs.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <Users className="w-12 h-12 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-bold mb-3">Grant Allocation</h3>
+                <p className="text-sm text-muted-foreground">
+                  Use reputation scores to prioritize grant applications and
+                  identify proven builders.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <Zap className="w-12 h-12 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-bold mb-3">Governance Weight</h3>
+                <p className="text-sm text-muted-foreground">
+                  Assign voting power proportional to contribution history and
+                  domain expertise.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <Gift className="w-12 h-12 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-bold mb-3">Contributor Rewards</h3>
+                <p className="text-sm text-muted-foreground">
+                  Automatically distribute rewards based on verified contribution
+                  metrics.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="bg-gradient-to-br from-primary/10 via-background to-background border-primary/20">
+            <CardContent className="pt-10 pb-10">
+              <div className="max-w-2xl mx-auto text-center">
+                <h3 className="text-2xl font-bold mb-4">Ready to Integrate?</h3>
+                <p className="text-muted-foreground mb-8">
+                  Access comprehensive documentation, API references, and integration
+                  guides to start building with ParaBuild.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button size="lg" className="gap-2" asChild>
+                    <a href="https://docs.parabuild.xyz" target="_blank" rel="noopener noreferrer">
+                      <FileCheck className="w-5 h-5" />
+                      View Documentation
+                    </a>
+                  </Button>
+                  <Button size="lg" variant="outline" className="gap-2" asChild>
+                    <a href="https://github.com/ParaBuild-Protocol" target="_blank" rel="noopener noreferrer">
+                      <Github className="w-5 h-5" />
+                      GitHub Repository
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="py-20 border-t border-border/30">
+        <div className="container">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              {
-                label: "Active Builders",
-                value: platformStats.totalContributors.toLocaleString(),
-                icon: Users,
-              },
-              {
-                label: "Rewards Claimed",
-                value: platformStats.totalRewardsDistributed.toLocaleString(),
-                icon: Gift,
-              },
-              {
-                label: "$PBUILD Earned",
-                value: `${(platformStats.totalPBuildEarned / 1000000).toFixed(
-                  1
-                )}M`,
-                icon: TrendingUp,
-              },
-              {
-                label: "Partner Projects",
-                value: platformStats.activeProjects.toLocaleString(),
-                icon: Code2,
-              },
+              { label: "Active Builders", value: platformStats.totalContributors.toLocaleString(), icon: Users },
+              { label: "Attestations Issued", value: "50,000+", icon: Shield },
+              { label: "Protocols Integrated", value: platformStats.activeProjects.toString(), icon: Boxes },
+              { label: "Total Reputation Score", value: "15M+", icon: TrendingUp },
             ].map((stat, i) => (
               <motion.div
                 key={i}
-                className="text-center group"
+                className="text-center"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <stat.icon className="w-8 h-8 mx-auto mb-3 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
-                <div className="font-mono text-4xl md:text-5xl font-bold text-foreground mb-2 tabular-nums">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-muted-foreground font-medium">
-                  {stat.label}
-                </div>
+                <stat.icon className="w-8 h-8 mx-auto mb-3 text-primary/50" />
+                <div className="text-4xl font-bold mb-2">{stat.value}</div>
+                <div className="text-sm text-muted-foreground">{stat.label}</div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Enhanced CTA Section */}
-      <section className="py-24 md:py-32 border-t border-border/30">
+      {/* CTA */}
+      <section className="py-32 border-t border-border/30">
         <div className="container">
-          <motion.div
-            className="relative overflow-hidden rounded-3xl border border-border/50 bg-linear-to-br from-surface/80 to-surface/40 backdrop-blur-sm p-12 md:p-16 text-center"
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-          >
-            {/* Background Decoration */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
-
-            <div className="relative z-10 max-w-2xl mx-auto">
-              <h2 className="font-display text-3xl md:text-5xl font-bold mb-6">
-                Ready to Start <span className="text-primary">Building?</span>
+          <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
+            <CardContent className="pt-16 pb-16 text-center">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                Start Building Your <span className="text-primary">Onchain Reputation</span>
               </h2>
-              <p className="text-muted-foreground text-lg mb-10 leading-relaxed">
-                Join thousands of Web3 builders transforming contributions into
-                verifiable credentials.
+              <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
+                Join the professional infrastructure layer for Web3 developer credibility.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
-                  size="lg"
-                  onClick={handleConnect}
-                  className="gap-2 px-8 h-12 text-base shadow-xl shadow-primary/25"
-                >
-                  <Wallet className="h-5 w-5" />
-                  Connect Wallet
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="gap-2 px-8 h-12 text-base border-border/50"
-                >
-                  View Rewards
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
-
-              {/* Social Proof */}
-              <div className="flex items-center justify-center gap-8 mt-10 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <div className="flex -space-x-2">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div
-                        key={i}
-                        className="w-8 h-8 rounded-full bg-linear-to-br from-primary to-accent border-2 border-background"
-                      />
-                    ))}
-                  </div>
-                  <span>10K+ builders</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <svg
-                        key={i}
-                        className="w-4 h-4 text-yellow-400 fill-current"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                      </svg>
-                    ))}
-                  </div>
-                  <span>5.0 rating</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+              <Button
+                size="lg"
+                onClick={handleConnect}
+                disabled={authenticating}
+                className="gap-2 px-10 h-14 text-lg"
+              >
+                {authenticating ? (
+                  <>
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Authenticating...
+                  </>
+                ) : isAuthenticated ? (
+                  <>
+                    Enter Dashboard
+                    <ChevronRight className="h-5 w-5" />
+                  </>
+                ) : (
+                  <>
+                    Get Started
+                    <Wallet className="h-5 w-5" />
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="border-t border-border py-12 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
-            {/* Brand */}
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-12 h-12">
-                  <img
-                    src="/pb-logo.png"
-                    alt="ParaBuild Logo"
-                    className="w-full h-full object-contain"
-                  />
+                <div className="w-8 h-8">
+                  <img src="/pb-logo.png" alt="ParaBuild" className="w-full h-full object-contain" />
                 </div>
-                <span className="font-display text-xl font-bold">
-                  ParaBuild
-                </span>
+                <span className="font-display text-xl font-bold">ParaBuild</span>
               </div>
-              <p className="text-sm text-muted-foreground mb-4">
-                The onchain reputation layer for Web3 builders. Transform
-                contributions into verifiable, portable, onchain reputation.
+              <p className="text-sm text-muted-foreground max-w-sm mb-4">
+                The onchain reputation layer for Web3 builders. Verifiable contributions,
+                portable credentials, composable infrastructure.
               </p>
-              <p className="text-xs text-muted-foreground">
-                Build Beyond. ParaBuild. 🚀
-              </p>
+              <p className="text-xs text-muted-foreground">Build Beyond. ParaBuild.</p>
             </div>
 
-            {/* Links */}
             <div>
               <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Dashboard
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Contributions
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Attestations
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Rewards
-                  </a>
-                </li>
+                <li><a href="#platform" className="hover:text-foreground transition-colors">Platform</a></li>
+                <li><a href="#architecture" className="hover:text-foreground transition-colors">Architecture</a></li>
+                <li><a href="#for-builders" className="hover:text-foreground transition-colors">For Builders</a></li>
+                <li><a href="#integration" className="hover:text-foreground transition-colors">Integration</a></li>
               </ul>
             </div>
 
-            {/* Social */}
             <div>
-              <h4 className="font-semibold mb-4">Community</h4>
+              <h4 className="font-semibold mb-4">Resources</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <a
-                    href="https://twitter.com/parabuildxyz"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-foreground transition-colors flex items-center gap-2"
-                  >
-                    <Twitter className="w-4 h-4" />
-                    Twitter
+                  <a href="https://docs.parabuild.xyz" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+                    Documentation
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="https://github.com/ParaBuild-Protocol"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-foreground transition-colors flex items-center gap-2"
-                  >
+                  <a href="https://github.com/ParaBuild-Protocol" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors flex items-center gap-2">
                     <Github className="w-4 h-4" />
                     GitHub
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="mailto:parabuildxyz@gmail.com"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Contact Us
+                  <a href="https://twitter.com/parabuildxyz" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors flex items-center gap-2">
+                    <Twitter className="w-4 h-4" />
+                    Twitter
                   </a>
                 </li>
               </ul>
             </div>
           </div>
 
-          {/* Bottom */}
           <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-            <div>© 2026 ParaBuild. All rights reserved.</div>
+            <div>© 2026 ParaBuild Protocol. All rights reserved.</div>
             <div className="flex gap-6">
-              <a href="#" className="hover:text-foreground transition-colors">
-                Privacy Policy
-              </a>
-              <a href="#" className="hover:text-foreground transition-colors">
-                Terms of Service
-              </a>
+              <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
+              <a href="#" className="hover:text-foreground transition-colors">Terms</a>
             </div>
           </div>
         </div>
       </footer>
-
-      {/* CSS for animations */}
-      <style jsx>{`
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-20px);
-          }
-        }
-        @keyframes gradient {
-          0%,
-          100% {
-            background-size: 200% 200%;
-            background-position: left center;
-          }
-          50% {
-            background-size: 200% 200%;
-            background-position: right center;
-          }
-        }
-        .animate-gradient {
-          animation: gradient 8s ease infinite;
-        }
-      `}</style>
     </div>
   );
 }
