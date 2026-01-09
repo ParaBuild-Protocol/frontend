@@ -1,31 +1,15 @@
-// store/contributionsStore.ts
+// store/contributionsStore.ts - Updated with centralized types
 import { create } from 'zustand';
 import { userApi } from '@/lib/api/user';
 import { toast } from 'sonner';
-
-export interface Contribution {
-  id: string;
-  user_id: string;
-  backend_id: string;
-  name: string;
-  description: string;
-  type: string;
-  proof_url: string;
-  github_url?: string;
-  status: 'pending' | 'verified' | 'rejected';
-  points?: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ContributionCreateData {
-  name: string;
-  description: string;
-  type: string;
-  proof_url: string;
-  github_url?: string;
-  backend_id: string;
-}
+import {
+  Contribution,
+  ContributionStatus,
+  ContributionType,
+  CreateContributionDTO,
+  ContributionFilters,
+  ContributionStats,
+} from '@/types';
 
 interface ContributionsState {
   // State
@@ -37,8 +21,8 @@ interface ContributionsState {
   error: string | null;
   
   // Filters
-  statusFilter: 'all' | 'pending' | 'verified' | 'rejected';
-  typeFilter: string | null;
+  statusFilter: ContributionStatus | 'all';
+  typeFilter: ContributionType | null;
   searchQuery: string;
   
   // Actions
@@ -50,24 +34,19 @@ interface ContributionsState {
   setError: (error: string | null) => void;
   
   // Filters
-  setStatusFilter: (status: 'all' | 'pending' | 'verified' | 'rejected') => void;
-  setTypeFilter: (type: string | null) => void;
+  setStatusFilter: (status: ContributionStatus | 'all') => void;
+  setTypeFilter: (type: ContributionType | null) => void;
   setSearchQuery: (query: string) => void;
   
   // Async Actions
-  fetchContributions: () => Promise<void>;
+  fetchContributions: (filters?: ContributionFilters) => Promise<void>;
   fetchContribution: (id: string) => Promise<void>;
   generateBackendId: () => Promise<string>;
-  submitContribution: (data: ContributionCreateData) => Promise<Contribution>;
+  submitContribution: (data: CreateContributionDTO) => Promise<Contribution>;
   
   // Computed
   getFilteredContributions: () => Contribution[];
-  getStats: () => {
-    total: number;
-    pending: number;
-    verified: number;
-    rejected: number;
-  };
+  getStats: () => ContributionStats;
 }
 
 export const useContributionsStore = create<ContributionsState>((set, get) => ({
@@ -142,7 +121,7 @@ export const useContributionsStore = create<ContributionsState>((set, get) => ({
   },
 
   // Submit contribution (Step 3 of submission, after smart contract)
-  submitContribution: async (data: ContributionCreateData) => {
+  submitContribution: async (data: CreateContributionDTO) => {
     set({ submitting: true, error: null });
     try {
       const contribution = await userApi.submitContribution(data);
@@ -197,11 +176,15 @@ export const useContributionsStore = create<ContributionsState>((set, get) => ({
   getStats: () => {
     const { contributions } = get();
     
-    return {
+    const stats: ContributionStats = {
       total: contributions.length,
-      pending: contributions.filter((c) => c.status === 'pending').length,
-      verified: contributions.filter((c) => c.status === 'verified').length,
-      rejected: contributions.filter((c) => c.status === 'rejected').length,
+      approved: contributions.filter((c) => c.status === ContributionStatus.APPROVED).length,
+      pending: contributions.filter((c) => c.status === ContributionStatus.PENDING).length,
+      rejected: contributions.filter((c) => c.status === ContributionStatus.REJECTED).length,
+      total_points: contributions.reduce((sum, c) => sum + c.points, 0),
+      total_tokens: contributions.reduce((sum, c) => sum + c.tokens_won, 0),
     };
+    
+    return stats;
   },
 }));

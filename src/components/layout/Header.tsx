@@ -1,4 +1,3 @@
-// components/layout/Header.tsx - Updated with Zustand
 import { useNavigate } from "react-router-dom";
 import {
   Menu,
@@ -38,6 +37,7 @@ interface HeaderProps {
 export function Header({ onMenuClick, isMobile }: HeaderProps) {
   const navigate = useNavigate();
   const { disconnect } = useDisconnect();
+  
   // Zustand stores
   const { user, stats, isAuthenticated, logout } = useAuthStore();
   const {
@@ -61,6 +61,12 @@ export function Header({ onMenuClick, isMobile }: HeaderProps) {
   const formatAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   };
+
+  // Get display name (username or truncated address)
+  const displayName = user?.username || (user?.wallet_address ? formatAddress(user.wallet_address) : "Anonymous");
+  const avatarInitials = user?.username 
+    ? user.username.charAt(0).toUpperCase()
+    : user?.wallet_address ? user.wallet_address.slice(2, 4).toUpperCase() : "?";
 
   // Show loading state or guest UI if not authenticated
   if (!isAuthenticated || !user) {
@@ -144,7 +150,7 @@ export function Header({ onMenuClick, isMobile }: HeaderProps) {
           <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/5 border border-primary/20">
             <Coins className="h-4 w-4 text-primary" />
             <span className="font-mono text-sm font-semibold text-primary">
-              {stats.totalPBUILD.toLocaleString()}
+              {stats.totalPBUILD?.toLocaleString() || 0}
             </span>
             <span className="text-xs text-muted-foreground">$PBUILD</span>
           </div>
@@ -153,7 +159,7 @@ export function Header({ onMenuClick, isMobile }: HeaderProps) {
         {/* Submit Button */}
         <Button
           onClick={() => navigate("/contributions/new")}
-          className="gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+          className="gap-2 bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
         >
           <Plus className="h-4 w-4" />
           <span className="hidden sm:inline">Submit</span>
@@ -238,22 +244,19 @@ export function Header({ onMenuClick, isMobile }: HeaderProps) {
               variant="ghost"
               className="gap-2 h-10 px-2 hover:bg-muted/50"
             >
-              {user.avatar ? (
+              {user?.avatar ? (
                 <img
-                  src={user.avatar}
-                  alt={user.username || "User"}
+                  src={user?.avatar}
+                  alt={displayName}
                   className="h-8 w-8 rounded-full ring-2 ring-border"
                 />
               ) : (
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-semibold ring-2 ring-border">
-                  {user.username?.[0]?.toUpperCase() ||
-                    user.wallet_address.slice(2, 4).toUpperCase()}
+                <div className="h-8 w-8 rounded-full bg-linear-to-br from-primary to-accent flex items-center justify-center text-white font-semibold ring-2 ring-border text-sm">
+                  {avatarInitials}
                 </div>
               )}
               <div className="hidden md:flex flex-col items-start">
-                <span className="text-sm font-medium">
-                  {user.username || formatAddress(user.wallet_address)}
-                </span>
+                <span className="text-sm font-medium">{displayName}</span>
                 <span className="text-xs text-muted-foreground">
                   Rank #{stats?.rank || "-"}
                 </span>
@@ -264,9 +267,7 @@ export function Header({ onMenuClick, isMobile }: HeaderProps) {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
               <div className="flex flex-col">
-                <span className="font-semibold">
-                  {user.username || "Anonymous"}
-                </span>
+                <span className="font-semibold">{displayName}</span>
                 <span className="text-xs font-normal text-muted-foreground font-mono">
                   {formatAddress(user.wallet_address)}
                 </span>
@@ -274,9 +275,7 @@ export function Header({ onMenuClick, isMobile }: HeaderProps) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() =>
-                navigate(`/profile/${user.username || user.wallet_address}`)
-              }
+              onClick={() => navigate(`/profile/${user.wallet_address}`)}
               className="cursor-pointer"
             >
               <User className="mr-2 h-4 w-4" />

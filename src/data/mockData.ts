@@ -12,17 +12,17 @@ import type {
 // Current user (mock authenticated user)
 export const currentUser: User = {
   id: "user_1",
-  address: "0x1234...5678",
+  wallet_address: "0x1234...5678",
   username: "PBuilder.eth",
   bio: "Full-stack Web3 developer | Building the future of decentralized applications | Hackathon enthusiast 🚀",
   avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=PBuilder",
   joinedAt: new Date("2024-01-15"),
   isAdmin: false,
-  socialLinks: {
-    github: "https://github.com/PBuilder",
-    twitter: "https://twitter.com/PBuilder_eth",
-    discord: "PBuilder#1234",
-  },
+  email: "pbuilder@example.com",
+  github_url: "https://github.com/PBuilder",
+  twitter_url: "https://twitter.com/PBuilder_eth",
+  website_url: "https://pbuilder.dev",
+  discord_username: "PBuilder#1234",
 };
 
 export const currentUserStats: UserStats = {
@@ -39,43 +39,40 @@ export const mockUsers: User[] = [
   currentUser,
   {
     id: "user_2",
-    address: "0x2345...6789",
+    wallet_address: "0x2345...6789",
     username: "defi_master",
     bio: "DeFi protocol architect",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=defi",
     joinedAt: new Date("2023-11-20"),
-    isAdmin: false,
-    socialLinks: { github: "https://github.com/defimaster" },
-  },
+    isAdmin: false, github_url: "https://github.com/defimaster" },
+  
   {
     id: "user_3",
-    address: "0x3456...7890",
+    wallet_address: "0x3456...7890",
     username: "nft_queen",
     bio: "NFT artist & smart contract dev",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=nft",
     joinedAt: new Date("2023-12-05"),
     isAdmin: false,
-    socialLinks: { twitter: "https://twitter.com/nftqueen" },
+    twitter_url: "https://twitter.com/nft_queen",
   },
   {
     id: "user_4",
-    address: "0x4567...8901",
+    wallet_address: "0x4567...8901",
     username: "solidity_wizard",
     bio: "Smart contract security researcher",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=solidity",
     joinedAt: new Date("2023-10-01"),
     isAdmin: false,
-    socialLinks: {},
   },
   {
     id: "user_5",
-    address: "0x5678...9012",
+    wallet_address: "0x5678...9012",
     username: "dao_builder",
     bio: "Building governance tools",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=dao",
     joinedAt: new Date("2024-02-01"),
     isAdmin: false,
-    socialLinks: {},
   },
 ];
 

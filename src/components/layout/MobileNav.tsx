@@ -14,16 +14,17 @@ import {
   MessageCircle,
   ChevronDown,
   User,
+  Award,
+  FileCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-// import { useAuth } from '@/context/AuthContext';
 import { useState } from "react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { currentUser, currentUserStats } from "@/data/mockData";
+import { useAuthStore } from "@/store/authStore";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -34,11 +35,14 @@ const mainNavItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { path: "/gig", label: "Gig", icon: User },
   { path: "/contributions", label: "Contributions", icon: FileText },
+  { path: "/attestations", label: "Attestations", icon: FileCheck },
+  { path: "/badges", label: "Skill Badges", icon: Award },
   { path: "/rewards", label: "Rewards", icon: Gift },
 ];
 
 const opportunityItems = [
   { path: "/hackathons", label: "Hackathons", icon: Sparkles },
+  { path: "/bug-bounties", label: "Bug Bounties", icon: Shield },
   { path: "/quests", label: "Quests", icon: Target },
   { path: "/open-source", label: "Open Source", icon: Code },
 ];
@@ -50,9 +54,7 @@ const communityItems = [
 
 export function MobileNav({ isOpen, onClose }: MobileNavProps) {
   const location = useLocation();
-  // const { user, stats } = useAuth();
-  const user = currentUser;
-  const stats = currentUserStats;
+  const { user, stats } = useAuthStore();
   const [opportunitiesOpen, setOpportunitiesOpen] = useState(true);
   const [communityOpen, setCommunityOpen] = useState(true);
 
@@ -139,8 +141,12 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
               className="flex items-center gap-2"
               onClick={onClose}
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/60">
-                <Coins className="h-5 w-5 text-primary-foreground" />
+              <div className="w-10 h-10">
+                <img
+                  src="/pb-logo.png"
+                  alt="ParaBuild"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <span className="text-xl font-bold">ParaBuild</span>
             </Link>
@@ -154,7 +160,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
 
           {/* Token Balance */}
           {stats && (
-            <div className="mx-3 mt-4 rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 p-4">
+            <div className="mx-3 mt-4 rounded-xl bg-linear-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 p-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20">
                   <Coins className="h-5 w-5 text-primary" />
@@ -237,21 +243,27 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
 
             {user && (
               <Link
-                to={`/profile/${user.username}`}
+                to={`/profile/${user.wallet_address}`}
                 onClick={onClose}
                 className="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-sidebar-accent/30 hover:bg-sidebar-accent/50 transition-colors"
               >
-                <img
-                  src={user.avatar}
-                  alt={user.username}
-                  className="h-8 w-8 rounded-full ring-2 ring-primary/20"
-                />
+                {user.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.username || "User"}
+                    className="h-8 w-8 rounded-full ring-2 ring-primary/20"
+                  />
+                ) : (
+                  <div className="h-8 w-8 rounded-full bg-linear-to-br from-primary to-accent flex items-center justify-center text-white font-semibold ring-2 ring-primary/20 text-sm">
+                    {user.username?.charAt(0).toUpperCase() || user.wallet_address?.slice(2, 4).toUpperCase()}
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">
-                    {user.username}
+                    {user.username || `${user.wallet_address?.slice(0, 6)}...${user.wallet_address?.slice(-4)}`}
                   </p>
                   <p className="text-xs text-muted-foreground truncate font-mono">
-                    {user.address?.slice(0, 6)}...{user.address?.slice(-4)}
+                    {user.wallet_address?.slice(0, 6)}...{user.wallet_address?.slice(-4)}
                   </p>
                 </div>
               </Link>

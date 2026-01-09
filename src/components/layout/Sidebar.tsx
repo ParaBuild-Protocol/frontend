@@ -34,7 +34,7 @@ interface SidebarProps {
 
 const mainNavItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/gig", label: "Gig", icon: User },
+  { path: "/gig", label: "Gig Profile", icon: User },
   { path: "/contributions", label: "Contributions", icon: FileText },
   { path: "/attestations", label: "Attestations", icon: FileCheck },
   { path: "/badges", label: "Skill Badges", icon: Award },
@@ -280,15 +280,15 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           {/* User Profile Link */}
           {user && !isCollapsed && (
             <Link
-              to={`/profile/${user.username}`}
+              to={`/profile/${user.wallet_address}`}
               className="flex items-center gap-3 rounded-xl px-3 py-2.5 mt-2 bg-sidebar-accent/30 hover:bg-sidebar-accent/50 transition-colors group"
             >
               <div className="h-8 w-8 rounded-full bg-linear-to-br from-primary to-accent flex items-center justify-center text-sm font-bold text-white ring-2 ring-primary/20">
-                {user.username?.charAt(0).toUpperCase() || "B"}
+                {user.username?.charAt(0).toUpperCase() || user.wallet_address?.slice(2, 4).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate group-hover:text-primary transition-colors">
-                  {user.username}
+                  {user.username || `${user.wallet_address?.slice(0, 6)}...${user.wallet_address?.slice(-4)}`}
                 </p>
                 <p className="text-xs text-muted-foreground truncate font-mono">
                   {user.wallet_address?.slice(0, 6)}...
