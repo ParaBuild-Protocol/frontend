@@ -13,6 +13,8 @@ interface User {
   avatar?: string;
   github_url?: string;
   twitter_url?: string;
+  website_url?: string;
+  email?: string;
   discord_username?: string;
   isAdmin?: boolean;
   created_at: string;

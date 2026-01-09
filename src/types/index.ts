@@ -1,26 +1,21 @@
 // User types
 export interface User {
   id: string;
-  address: string;
+  wallet_address: string;
   username: string;
   bio?: string;
   avatar: string;
   joinedAt: Date;
   isAdmin: boolean;
-  socialLinks: {
-    github?: string;
-    twitter?: string;
-    discord?: string;
-  };
-  // Extended fields for profile pages
-  walletAddress?: string;
+  email?: string;
   tokenBalance?: number;
   totalPoints?: number;
   rank?: number;
   createdAt?: string;
-  github?: string;
-  twitter?: string;
-  website?: string;
+  github_url?: string;
+  twitter_url?: string;
+  website_url?: string;
+  discord_username?: string;
 }
 
 export interface UserStats {
