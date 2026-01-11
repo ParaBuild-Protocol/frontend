@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "../ThemeToggle";
-import { cn } from "@/lib/utils";
+import { cn, formatBalance } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
 import { useUIStore } from "@/store/uiStore";
 import { useDisconnect } from "@reown/appkit/react";
@@ -150,7 +150,7 @@ export function Header({ onMenuClick, isMobile }: HeaderProps) {
           <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/5 border border-primary/20">
             <Coins className="h-4 w-4 text-primary" />
             <span className="font-mono text-sm font-semibold text-primary">
-              {stats.totalPBUILD?.toLocaleString() || 0}
+               {formatBalance(stats?.totalPBUILD || 0)}
             </span>
             <span className="text-xs text-muted-foreground">$PBUILD</span>
           </div>

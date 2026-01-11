@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { LucideIcon, Coins, Target, Trophy, Gift } from "lucide-react";
 import { motion } from "framer-motion";
 import { UserStats } from "@/types";
+import { formatBalance } from "@/lib/utils";
 
 interface StatCardProps {
   icon: LucideIcon;
@@ -42,7 +43,7 @@ export const ProfileStats = ({ stats }: ProfileStatsProps) => {
   const statCards = [
     {
       icon: Coins,
-      value: stats.totalPBUILD.toLocaleString(),
+      value: formatBalance(stats?.totalPBUILD || 0),
       label: "$PBUILD",
       iconColor: "primary",
     },

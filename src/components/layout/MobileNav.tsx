@@ -17,7 +17,7 @@ import {
   Award,
   FileCheck,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatBalance } from "@/lib/utils";
 import { useState } from "react";
 import {
   Collapsible,
@@ -168,7 +168,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                 <div>
                   <p className="text-xs text-muted-foreground">Your Balance</p>
                   <p className="text-lg font-bold font-mono text-primary">
-                    {stats.totalPBUILD?.toLocaleString() || 0}
+                    {formatBalance(stats?.totalPBUILD || 0)}
                   </p>
                 </div>
               </div>
