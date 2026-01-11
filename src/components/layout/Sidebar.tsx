@@ -18,7 +18,7 @@ import {
   Award,
   FileCheck,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatBalance } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
 import { useState } from "react";
 import {
@@ -195,7 +195,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
                   Your Balance
                 </p>
                 <p className="text-lg font-bold font-mono text-primary">
-                  {stats.totalPBUILD?.toLocaleString() || 0}
+                  {formatBalance(stats?.totalPBUILD || 0)}
                 </p>
               </div>
             </div>

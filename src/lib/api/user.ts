@@ -46,7 +46,7 @@ export const userApi = {
    */
   submitContribution: async (data: CreateContributionDTO): Promise<Contribution> => {
     const response = await apiClient.post('/user/contributions', data);
-    return response.data;
+    return response.data.contribution;
   },
 
   /**
@@ -54,7 +54,7 @@ export const userApi = {
    */
   getContributions: async (): Promise<Contribution[]> => {
     const response = await apiClient.get('/user/contributions');
-    return response.data;
+    return response.data?.contributions;
   },
 
   /**

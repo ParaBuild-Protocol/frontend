@@ -26,7 +26,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 // import { useAuth } from '@/context/AuthContext';
-import { cn } from "@/lib/utils";
+import { cn, formatBalance } from "@/lib/utils";
 import { currentUser, currentUserStats } from "@/data/mockData";
 
 export default function GigPage() {
@@ -256,14 +256,14 @@ export default function GigPage() {
 
       {/* Hero Card */}
       <Card className="border-border/50 overflow-hidden">
-        <div className="relative bg-gradient-to-br from-primary/20 via-accent/10 to-primary/5 p-8 md:p-12 border-b border-border/50">
+        <div className="relative bg-linear-to-br from-primary/20 via-accent/10 to-primary/5 p-8 md:p-12 border-b border-border/50">
           <div className="absolute inset-0 bg-grid opacity-10" />
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[100px]" />
 
           <div className="relative flex flex-col lg:flex-row gap-8 items-start">
             {/* Avatar */}
-            <div className="flex-shrink-0">
-              <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-5xl font-bold text-primary-foreground shadow-2xl">
+            <div className="shrink-0">
+              <div className="w-32 h-32 rounded-2xl bg-linear-to-br from-primary to-accent flex items-center justify-center text-5xl font-bold text-primary-foreground shadow-2xl">
                 {user?.username?.charAt(0).toUpperCase()}
               </div>
             </div>
@@ -381,7 +381,7 @@ export default function GigPage() {
             </div>
 
             {/* CTA */}
-            <div className="flex-shrink-0 flex flex-col gap-3">
+            <div className="shrink-0 flex flex-col gap-3">
               <Button size="lg" className="w-full gap-2">
                 <Mail className="h-4 w-4" />
                 Contact Me
@@ -502,7 +502,7 @@ export default function GigPage() {
                   key={i}
                   className="relative pl-8 pb-6 border-l-2 border-border last:pb-0"
                 >
-                  <div className="absolute left-[-9px] top-0 w-4 h-4 rounded-full bg-primary border-2 border-card" />
+                  <div className="absolute -left-2.25 top-0 w-4 h-4 rounded-full bg-primary border-2 border-card" />
                   <div className="mb-2">
                     <h4 className="font-semibold text-lg">{exp.title}</h4>
                     <div className="text-sm text-muted-foreground">
@@ -518,7 +518,7 @@ export default function GigPage() {
                   <div className="space-y-1">
                     {exp.achievements.map((achievement, j) => (
                       <div key={j} className="flex items-start gap-2 text-sm">
-                        <CheckCircle className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-4 w-4 text-success mt-0.5 shrink-0" />
                         <span className="text-muted-foreground">
                           {achievement}
                         </span>
@@ -545,7 +545,7 @@ export default function GigPage() {
                   className="p-5 rounded-xl bg-muted/30 border border-border/50"
                 >
                   <div className="flex items-start gap-4 mb-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-sm font-bold text-primary-foreground flex-shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary to-accent flex items-center justify-center text-sm font-bold text-primary-foreground shrink-0">
                       {testimonial.avatar}
                     </div>
                     <div className="flex-1">
@@ -605,7 +605,7 @@ export default function GigPage() {
                   <div className="relative h-2 bg-muted rounded-full overflow-hidden">
                     <div
                       className={cn(
-                        "h-full bg-gradient-to-r transition-all duration-500",
+                        "h-full bg-linear-to-r transition-all duration-500",
                         getSkillColor(skill.category)
                       )}
                       style={{ width: `${skill.level}%` }}
@@ -670,7 +670,7 @@ export default function GigPage() {
                   Total $PBUILD
                 </span>
                 <span className="font-mono font-bold text-primary">
-                  {stats?.totalPBUILD.toLocaleString()}
+                   {formatBalance(stats?.totalPBUILD || 0)}
                 </span>
               </div>
               <div className="flex items-center justify-between">
